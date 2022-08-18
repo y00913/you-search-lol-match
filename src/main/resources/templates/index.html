@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>search match</title>
+</head>
+<body>
+
+<div th:fragment="search">
+    <h2>
+        <form th:action="@{/}" method="post">
+            <label>닉네임</label>
+            <input type="text" name="summonerName" required>
+            <button type="submit">검색</button>
+        </form>
+    </h2>
+</div>
+
+</body>
+</html>

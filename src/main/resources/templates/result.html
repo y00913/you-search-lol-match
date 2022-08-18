@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>search match</title>
+</head>
+<body>
+
+<div th:replace="index :: search">
+</div>
+
+<div align="center">
+    <th:block th:if="${result != null}">
+        <h2>
+            <img th:src="${iconUrl}" width="150">
+            <p>닉네임 : <a th:text="${result.name}"></a></p>
+            <p>레벨 : <a th:text="${result.summonerLevel}"></a></p>
+
+            <th:block th:if="${!#lists.isEmpty(leagueEntry)}">
+                <p><img th:src="${tierUrl}" width="150"></p>
+                <p>
+                    <a th:text="${leagueEntry[0].tier}"></a>
+                    <a th:text="${leagueEntry[0].rank}"></a>
+                    <a th:text="${leagueEntry[0].leaguePoints} + 포인트"></a>
+                </p>
+                <p>
+                    승리 : <a th:text="${leagueEntry[0].wins}"></a>
+                    패배 : <a th:text="${leagueEntry[0].losses}"></a>
+                </p>
+            </th:block>
+
+            <th:blcok th:if="${#lists.isEmpty(leagueEntry)}">
+                Unranked
+            </th:blcok>
+        </h2>
+
+        <br>
+
+        <th:block th:if="${!#lists.isEmpty(matches)}">
+            <th:block th:each="match : ${matches}">
+                <h3>
+                    <p>
+                        <a th:if="${match.gameMode == 'ARAM'}"> 무작위 총력전 </a>
+                        <a th:if="${match.gameMode == 'CLASSIC'}"> 소환사 협곡 </a>
+                    </p>
+                    <p>
+                        <a th:if="${match.win == true}" style="color: blue">
+                            승리
+                        </a>
+                        <a th:if="${match.win == false}" style="color: red">
+                            패배
+                        </a>
+                        <a th:text="${match.gameDurationMinutes}"></a>분
+                        <a th:text="${match.gameDurationSeconds}"></a>초
+                    </p>
+                </h3>
+
+                <th:block th:each="userInfo : ${match.matchUserInfoDTOs}">
+                    <h4>
+                        <span th:if="${userInfo.win == true}" style="color: blue">
+                            <a th:text="${userInfo.summonerName}"></a>
+                        </span>
+                        <span th:if="${userInfo.win == false}" style="color: red">
+                            <a th:text="${userInfo.summonerName}"></a>
+                        </span>
+                        <a th:text="${userInfo.championName}"></a>
+                        <a th:text="${userInfo.kills}"></a> /
+                        <a th:text="${userInfo.deaths}"></a> /
+                        <a th:text="${userInfo.assists}"></a>
+                    </h4>
+
+                    <h5>
+                        <details>
+                            <summary> 상세보기</summary>
+                            <p>
+                                cs : <a th:text="${userInfo.totalMinionsKilled}"></a>
+                                dmg : <a th:text="${userInfo.totalDamageDealtToChampions}"></a>
+                            </p>
+                            <p>
+                                item : <a th:text="${userInfo.item0}"></a>
+                                <a th:text="${userInfo.item1}"></a>
+                                <a th:text="${userInfo.item2}"></a>
+                                <a th:text="${userInfo.item3}"></a>
+                                <a th:text="${userInfo.item4}"></a>
+                                <a th:text="${userInfo.item5}"></a>
+                                <a th:text="${userInfo.item6}"></a>
+                            </p>
+                            <p>
+                                Perk : <a th:text="${userInfo.primaryPerk}"></a>
+                                <a th:text="${userInfo.subPerk}"></a>
+                            </p>
+                        </details>
+                    </h5>
+                </th:block>
+                <br>
+            </th:block>
+        </th:block>
+
+    </th:block>
+    <th:block th:if="${result == null}">
+        잘못된 소환사 이름입니다. 다시 입력하세요.
+    </th:block>
+</div>
+
+</body>
+</html>
