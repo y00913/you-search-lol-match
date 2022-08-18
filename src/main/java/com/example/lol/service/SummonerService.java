@@ -65,7 +65,7 @@ public class SummonerService {
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url + puuid + "/ids?start=0&count=10&api_key=" + myKey);
+            HttpGet request = new HttpGet(url + puuid + "/ids?start=0&count=7&api_key=" + myKey);
 
             HttpResponse response = client.execute(request);
 
@@ -132,9 +132,16 @@ public class SummonerService {
 
                 matchDTO.setGameMode(info.get("gameMode").toString());
 
-                long timestamp = System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString());
-                String endTime = Math.round((timestamp/1000/60/60/24)) + "일 전";
-                matchDTO.setEndTime(endTime);
+                long timestamp = (System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString())) / 1000 / 60 / 60;
+
+                if (timestamp >= 24) {
+                    String endTime = Math.round(timestamp / 24) + "일 전";
+                    matchDTO.setEndTime(endTime);
+                } else {
+                    String endTime = Math.round(timestamp) + "시간 전";
+                    matchDTO.setEndTime(endTime);
+                }
+
 
                 Long gameDuration = Long.parseLong(info.get("gameDuration").toString());
                 matchDTO.setGameDurationMinutes(gameDuration/60);
