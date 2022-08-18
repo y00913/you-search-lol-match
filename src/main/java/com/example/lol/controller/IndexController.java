@@ -2,6 +2,7 @@ package com.example.lol.controller;
 
 import com.example.lol.dto.LeagueEntryDTO;
 import com.example.lol.dto.MatchDTO;
+import com.example.lol.dto.MatchUserInfoDTO;
 import com.example.lol.dto.SummonerDTO;
 import com.example.lol.service.IconService;
 import com.example.lol.service.SummonerService;

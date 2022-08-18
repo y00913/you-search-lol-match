@@ -68,7 +68,7 @@ public class SummonerService {
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url + puuid + "/ids?start=0&count=5&api_key=" + myKey);
+            HttpGet request = new HttpGet(url + puuid + "/ids?start=0&count=10&api_key=" + myKey);
 
             HttpResponse response = client.execute(request);
 
@@ -117,6 +117,7 @@ public class SummonerService {
     public MatchDTO callMatchAbout(String matchId, String summonerName) {
         String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + myKey;
         MatchDTO matchDTO = new MatchDTO();
+        IconService iconService = new IconService();
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
@@ -148,19 +149,20 @@ public class SummonerService {
                         matchDTO.setWin((boolean) participant.get("win"));
                     }
                     matchUserInfoDTO.setWin((boolean) participant.get("win"));
-                    matchUserInfoDTO.setChampionName(participant.get("championName").toString());
+                    matchUserInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
                     matchUserInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
                     matchUserInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
                     matchUserInfoDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
                     matchUserInfoDTO.setTotalMinionsKilled(Integer.parseInt(participant.get("totalMinionsKilled").toString()));
                     matchUserInfoDTO.setTotalDamageDealtToChampions(Integer.parseInt(participant.get("totalDamageDealtToChampions").toString()));
-                    matchUserInfoDTO.setItem0(Integer.parseInt(participant.get("item0").toString()));
-                    matchUserInfoDTO.setItem1(Integer.parseInt(participant.get("item1").toString()));
-                    matchUserInfoDTO.setItem2(Integer.parseInt(participant.get("item2").toString()));
-                    matchUserInfoDTO.setItem3(Integer.parseInt(participant.get("item3").toString()));
-                    matchUserInfoDTO.setItem4(Integer.parseInt(participant.get("item4").toString()));
-                    matchUserInfoDTO.setItem5(Integer.parseInt(participant.get("item5").toString()));
-                    matchUserInfoDTO.setItem6(Integer.parseInt(participant.get("item6").toString()));
+
+                    List<String> items = new ArrayList<>();
+
+                    for(int j=0;j<=6;j++){
+                        items.add(iconService.callItemIcon(participant.get("item" + j).toString()));
+                    }
+
+                    matchUserInfoDTO.setItems(items);
 
                     JSONObject perks = (JSONObject) participant.get("perks");
                     JSONArray styles = (JSONArray) perks.get("styles");
@@ -169,8 +171,8 @@ public class SummonerService {
                     JSONArray primarySelections = (JSONArray) primaryStyle.get("selections");
                     JSONObject primarySelectionsNumber = (JSONObject) primarySelections.get(0);
 
-                    matchUserInfoDTO.setPrimaryPerk(Integer.parseInt(primarySelectionsNumber.get("perk").toString()));
-                    matchUserInfoDTO.setSubPerk(Integer.parseInt(subStyle.get("style").toString()));
+                    matchUserInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
+                    matchUserInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
 
                     matchUserInfoDTOs.add(matchUserInfoDTO);
                 }
