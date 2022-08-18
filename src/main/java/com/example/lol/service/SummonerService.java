@@ -1,9 +1,6 @@
 package com.example.lol.service;
 
-import com.example.lol.dto.LeagueEntryDTO;
-import com.example.lol.dto.MatchDTO;
-import com.example.lol.dto.MatchUserInfoDTO;
-import com.example.lol.dto.SummonerDTO;
+import com.example.lol.dto.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
@@ -135,18 +132,31 @@ public class SummonerService {
 
                 matchDTO.setGameMode(info.get("gameMode").toString());
 
+                long timestamp = System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString());
+                String endTime = Math.round((timestamp/1000/60/60/24)) + "일 전";
+                matchDTO.setEndTime(endTime);
+
                 Long gameDuration = Long.parseLong(info.get("gameDuration").toString());
                 matchDTO.setGameDurationMinutes(gameDuration/60);
                 matchDTO.setGameDurationSeconds(gameDuration%60);
 
                 List<MatchUserInfoDTO> matchUserInfoDTOs = new ArrayList<>();
+                MyInfoDTO myInfoDTO = new MyInfoDTO();
                 for(int i=0;i<participants.size();i++){
                     JSONObject participant = (JSONObject) participants.get(i);
                     MatchUserInfoDTO matchUserInfoDTO = new MatchUserInfoDTO();
 
                     matchUserInfoDTO.setSummonerName(participant.get("summonerName").toString());
-                    if(participant.get("summonerName").toString().equals(summonerName)) {
+
+                    if(participant.get("summonerName").toString().equalsIgnoreCase(summonerName)) {
                         matchDTO.setWin((boolean) participant.get("win"));
+                        myInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
+
+                        List<String> myItems = new ArrayList<>();
+                        for(int j=0;j<=6;j++){
+                            myItems.add(iconService.callItemIcon(participant.get("item" + j).toString()));
+                        }
+                        myInfoDTO.setItems(myItems);
                     }
                     matchUserInfoDTO.setWin((boolean) participant.get("win"));
                     matchUserInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
@@ -171,12 +181,18 @@ public class SummonerService {
                     JSONArray primarySelections = (JSONArray) primaryStyle.get("selections");
                     JSONObject primarySelectionsNumber = (JSONObject) primarySelections.get(0);
 
+                    if(participant.get("summonerName").toString().equalsIgnoreCase(summonerName)){
+                        myInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
+                        myInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
+                    }
+
                     matchUserInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
                     matchUserInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
 
                     matchUserInfoDTOs.add(matchUserInfoDTO);
                 }
 
+                matchDTO.setMyInfoDTO(myInfoDTO);
                 matchDTO.setMatchUserInfoDTOs(matchUserInfoDTOs);
             } else {
                 System.out.println("error : " + response.getStatusLine().getStatusCode());

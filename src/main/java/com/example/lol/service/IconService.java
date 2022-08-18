@@ -29,6 +29,10 @@ public class IconService {
     public String callChampionIcon(String champion){
         String url = "http://ddragon.leagueoflegends.com/cdn/12.15.1/img/champion/" + champion + ".png";
 
+        if(champion.equals("FiddleSticks")){
+            url = "http://ddragon.leagueoflegends.com/cdn/12.15.1/img/champion/" + "Fiddlesticks" + ".png";
+        }
+
         return url;
     }
 

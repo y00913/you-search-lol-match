@@ -15,4 +15,6 @@ public class MatchDTO {
     private Long gameDurationSeconds;
     private String gameMode;
     private boolean win;
+    private String endTime;
+    private MyInfoDTO myInfoDTO;
 }

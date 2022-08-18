@@ -34,9 +34,9 @@ public class IndexController {
 
     @PostMapping
     public String postResult(String summonerName, Model model){
-        summonerName = summonerName.replaceAll(" ","%20");
+        String summonerNameRepl = summonerName.replaceAll(" ","%20");
 
-        SummonerDTO result = summonerService.callRiotAPISummonerByName(summonerName);
+        SummonerDTO result = summonerService.callRiotAPISummonerByName(summonerNameRepl);
         model.addAttribute("result",result);
 
         if(result != null) {
@@ -56,6 +56,7 @@ public class IndexController {
             System.out.println(matchHistory);
 
             List<MatchDTO> matchDTOs = new ArrayList<>();
+
             for(String match : matchHistory) {
                 MatchDTO matchDTO = summonerService.callMatchAbout(match, summonerName);
                 matchDTOs.add(matchDTO);

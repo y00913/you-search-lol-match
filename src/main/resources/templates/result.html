@@ -11,18 +11,18 @@
 
 <div align="center">
     <th:block th:if="${result != null}">
+        <img th:src="${iconUrl}" width="150" style="border-radius: 30px">
         <h2>
-            <img th:src="${iconUrl}" width="150">
             <p>
                 닉네임 : <span th:text="${result.name}"></span>
             </p>
             <p>
                 레벨 : <span th:text="${result.summonerLevel}"></span>
             </p>
-
-
-            <th:block th:if="${!#lists.isEmpty(leagueEntry)}">
-                <p><img th:src="${tierUrl}" width="150"></p>
+        </h2>
+        <th:block th:if="${!#lists.isEmpty(leagueEntry)}">
+            <p><img th:src="${tierUrl}" width="150" style="border-radius: 30px"></p>
+            <h2>
                 <p>
                     <span th:text="${leagueEntry[0].tier}"></span>
                     <span th:text="${leagueEntry[0].rank}"></span>
@@ -32,74 +32,106 @@
                     승리 : <span th:text="${leagueEntry[0].wins}"></span>
                     패배 : <span th:text="${leagueEntry[0].losses}"></span>
                 </p>
-            </th:block>
+            </h2>
+        </th:block>
 
-            <th:blcok th:if="${#lists.isEmpty(leagueEntry)}">
-                Unranked
-            </th:blcok>
-        </h2>
+        <th:blcok th:if="${#lists.isEmpty(leagueEntry)}">
+            <h2>Unranked</h2>
+        </th:blcok>
 
         <br>
 
         <th:block th:if="${!#lists.isEmpty(matches)}">
-            <table th:each="match : ${matches}">
-                <h3>
-                    <p th:if="${match.gameMode == 'ARAM'}"> 무작위 총력전 </p>
-                    <p th:if="${match.gameMode == 'CLASSIC'}"> 소환사 협곡 </p>
-                    <p>
-                        <span th:if="${match.win == true}" style="color: blue">
-                            승리
-                        </span>
-                        <span th:if="${match.win == false}" style="color: red">
-                            패배
-                        </span>
-                        <span th:text="${match.gameDurationMinutes}"></span>분
-                        <span th:text="${match.gameDurationSeconds}"></span>초
-                    </p>
-                </h3>
+            <table>
+                <tr th:each="match : ${matches}">
+                    <td style="text-align: center; padding: 30px 0 30px 0">
+                        <h3>
+                            <span th:if="${match.gameMode == 'ARAM'}">무작위 총력전 </span>
+                            <span th:if="${match.gameMode == 'CLASSIC'}"> 소환사 협곡 </span>
+                            <span th:text="${match.endTime}"></span>
+                            <p>
+                                <span th:if="${match.win == true}" style="color: blue">
+                                    승리
+                                </span>
+                                <span th:if="${match.win == false}" style="color: red">
+                                    패배
+                                </span>
+                                <span th:text="${match.gameDurationMinutes}"></span>분
+                                <span th:text="${match.gameDurationSeconds}"></span>초
+                            </p>
+                        </h3>
 
-                <tr th:each="userInfo : ${match.matchUserInfoDTOs}">
-                    <h4>
-                        <td>
-                            <th:block th:if="${userInfo.win == true}">
-                                <span th:text="${userInfo.summonerName}" style="color: blue"></span>
-                            </th:block>
-                            <th:block th:if="${userInfo.win == false}">
-                                <span th:text="${userInfo.summonerName}" style="color: red"></span>
-                            </th:block>
-                        </td>
-                        <td><img th:src="${userInfo.championName}" width="25"></span></td>
-                        <td>
-                            <span th:text="${userInfo.kills}"></span> /
-                            <span th:text="${userInfo.deaths}"></span> /
-                            <span th:text="${userInfo.assists}"></span>
-                        </td>
-                    </h4>
+                        <img th:src="${match.myInfoDTO.championName}" width="100" style="border-radius: 70px">
 
-                    <h5>
+                        <details>
+                            <summary> 상세보기</summary>
+                            <table>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th>KDA</th>
+                                    <th>cs</th>
+                                    <th>피해량</th>
+                                    <th>아이탬</th>
+                                </tr>
 
-                        <td>
-                            cs : <span th:text="${userInfo.totalMinionsKilled}"></span>
-                            dmg : <span th:text="${userInfo.totalDamageDealtToChampions}"></span>
-                        </td>
-                        <td>
-                            <th:block th:each="item : ${userInfo.items}">
-                                <img th:src="${item}" width="25">
-                            </th:block>
-                        </td>
-                        <td>
-                            <img th:src="${userInfo.primaryPerk}" width="30"
-                                 style="background-color: black; border-radius: 70px">
-                            <img th:src="${userInfo.subPerk}" width="30">
-                        </td>
-                    </h5>
+                                <tr th:each="userInfo : ${match.matchUserInfoDTOs}">
+                                    <td><img th:src="${userInfo.championName}" width="40"
+                                             style="border-radius: 70px">
+                                    </td>
+                                    <td>
+                                        <div style="vertical-align: top">
+                                            <img th:src="${userInfo.primaryPerk}" width="20"
+                                                 style="background-color: black; border-radius: 70px">
+                                        </div>
+                                        <div style="vertical-align: bottom">
+                                            <img th:src="${userInfo.subPerk}" width="20">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <th:block th:if="${userInfo.win == true}">
+                                            <p th:text="${userInfo.summonerName}"
+                                               style="color: blue; font-weight: bold"></p>
+                                        </th:block>
+                                        <th:block th:if="${userInfo.win == false}">
+                                            <p th:text="${userInfo.summonerName}"
+                                               style="color: red; font-weight: bold"></p>
+                                        </th:block>
+                                    </td>
+                                    <td style="text-align: center">
+                                        <span th:text="${userInfo.kills}" style="font-weight: bold"></span> /
+                                        <span th:text="${userInfo.deaths}" style="font-weight: bold"></span> /
+                                        <span th:text="${userInfo.assists}" style="font-weight: bold"></span>
+                                    </td>
+
+
+                                    <td style="text-align: center">
+                                            <span th:text="${userInfo.totalMinionsKilled}"
+                                                  style="font-weight: bold"></span>
+                                    </td>
+                                    <td style="text-align: center">
+                                    <span th:text="${userInfo.totalDamageDealtToChampions}"
+                                          style="font-weight: bold"></span>
+                                    </td>
+                                    <td>
+                                        <th:block th:each="item : ${userInfo.items}">
+                                            <img th:src="${item}" width="30">
+                                        </th:block>
+                                    </td>
+                                </tr>
+                            </table>
+                        </details>
+                    </td>
                 </tr>
             </table>
         </th:block>
 
     </th:block>
     <th:block th:if="${result == null}">
-        잘못된 소환사 이름입니다. 다시 입력하세요.
+        <h2>
+            잘못된 소환사 이름입니다. 다시 입력하세요.
+        </h2>
     </th:block>
     <br>
 </div>
