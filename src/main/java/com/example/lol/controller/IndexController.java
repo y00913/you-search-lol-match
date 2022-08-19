@@ -50,7 +50,7 @@ public class IndexController {
                 model.addAttribute("tierUrl", iconService.callTierIcon(leagueEntry.get(0).getTier()));
             }
 
-            List<String> matchHistory = summonerService.callMatchHistory(result.getPuuid());
+            List<String> matchHistory = summonerService.callMatchHistory(result.getPuuid(), 0);
 
             System.out.println(result);
             System.out.println(matchHistory);

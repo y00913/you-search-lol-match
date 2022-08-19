@@ -14,4 +14,7 @@ public class MyInfoDTO {
     private List<String> items;
     private String primaryPerk;
     private String subPerk;
+    private int kills;
+    private int deaths;
+    private int assists;
 }

@@ -3,17 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <title>search match</title>
+    <style>
+        .center-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 70vh;
+        }
+    </style>
 </head>
 <body>
 
-<div th:fragment="search">
-    <h2>
-        <form th:action="@{/}" method="post">
-            <label>닉네임</label>
-            <input type="text" name="summonerName" required>
-            <button type="submit">검색</button>
-        </form>
-    </h2>
+<div class="center-screen">
+    <h1>
+        <p>Search Match</p>
+    </h1>
+    <form th:action="@{/}" method="post" autocomplete="on">
+        <input type="text" name="summonerName" style="width: 400px; height: 20px" placeholder="닉네임" required autofocus>
+        <button type="submit">검색</button>
+    </form>
+
+    <br><br>
+
+    <p style="font-weight: bold">
+        made by <a th:href="@{https://github.com/y00913}">y00913</a>
+    </p>
 </div>
 
 </body>

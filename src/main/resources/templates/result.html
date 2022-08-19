@@ -6,34 +6,57 @@
 </head>
 <body>
 
-<div th:replace="index :: search">
+<div style="text-align: center">
+    <h1>
+        <p>Search Match</p>
+    </h1>
+    <form th:action="@{/}" method="post" autocomplete="on">
+        <input type="text" name="summonerName" style="width: 400px; height: 20px" placeholder="닉네임" required>
+        <button type="submit">검색</button>
+    </form>
 </div>
+
+<br><br>
 
 <div align="center">
     <th:block th:if="${result != null}">
-        <img th:src="${iconUrl}" width="150" style="border-radius: 30px">
-        <h2>
-            <p>
-                닉네임 : <span th:text="${result.name}"></span>
-            </p>
-            <p>
-                레벨 : <span th:text="${result.summonerLevel}"></span>
-            </p>
-        </h2>
-        <th:block th:if="${!#lists.isEmpty(leagueEntry)}">
-            <p><img th:src="${tierUrl}" width="150" style="border-radius: 30px"></p>
-            <h2>
-                <p>
-                    <span th:text="${leagueEntry[0].tier}"></span>
-                    <span th:text="${leagueEntry[0].rank}"></span>
-                    <span th:text="${leagueEntry[0].leaguePoints} + 포인트"></span>
-                </p>
-                <p>
-                    승리 : <span th:text="${leagueEntry[0].wins}"></span>
-                    패배 : <span th:text="${leagueEntry[0].losses}"></span>
-                </p>
-            </h2>
-        </th:block>
+        <table style="text-align: center">
+            <tr>
+                <td>
+                    <img th:src="${iconUrl}" width="150" style="border-radius: 30px">
+                </td>
+                <td>
+                    <h2>
+                        <p>
+                            <span th:text="${result.name}"></span>
+                        </p>
+                        <p>
+                            레벨 : <span th:text="${result.summonerLevel}"></span>
+                        </p>
+                    </h2>
+                </td>
+            </tr>
+            <tr>
+                <th:block th:if="${!#lists.isEmpty(leagueEntry)}">
+                    <td>
+                        <p><img th:src="${tierUrl}" width="150" style="border-radius: 30px"></p>
+                    </td>
+                    <td>
+                        <h2>
+                            <p>
+                                <span th:text="${leagueEntry[0].tier}"></span>
+                                <span th:text="${leagueEntry[0].rank}"></span>
+                                <span th:text="${leagueEntry[0].leaguePoints} + 포인트"></span>
+                            </p>
+                            <p>
+                                <span th:text="${leagueEntry[0].wins}"></span>승
+                                <span th:text="${leagueEntry[0].losses}"></span>패
+                            </p>
+                        </h2>
+                    </td>
+                </th:block>
+            </tr>
+        </table>
 
         <th:blcok th:if="${#lists.isEmpty(leagueEntry)}">
             <h2>Unranked</h2>
@@ -61,11 +84,43 @@
                             </p>
                         </h3>
 
-                        <img th:src="${match.myInfoDTO.championName}" width="100" style="border-radius: 70px">
+                        <table style="margin-left: auto; margin-right: auto">
+                            <tr>
+                                <td>
+                                    <img th:src="${match.myInfoDTO.championName}" width="100"
+                                         style="border-radius: 70px">
+                                </td>
+                                <td>
+                                    <div style="vertical-align: top">
+                                        <img th:src="${match.myInfoDTO.primaryPerk}" width="40"
+                                             style="background-color: black; border-radius: 70px">
+                                    </div>
+                                    <div style="vertical-align: bottom">
+                                        <img th:src="${match.myInfoDTO.subPerk}" width="40">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="vertical-align: top">
+                                        <h2>
+                                            <span th:text="${match.myInfoDTO.kills}"></span> /
+                                            <span th:text="${match.myInfoDTO.deaths}"></span> /
+                                            <span th:text="${match.myInfoDTO.assists}"></span>
+                                        </h2>
+                                    </div>
+
+                                    <div style="vertical-align: bottom">
+                                        <th:block th:each="item : ${match.myInfoDTO.items}">
+                                            <img th:src="${item}" width="30">
+                                        </th:block>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
 
                         <details>
-                            <summary> 상세보기</summary>
-                            <table>
+                            <summary style="cursor: pointer"> 상세보기</summary>
+                            <table style="border: solid black 1px">
                                 <tr>
                                     <th></th>
                                     <th></th>
@@ -134,6 +189,11 @@
         </h2>
     </th:block>
     <br>
+
+<!--    <form th:action="@{/}" method="post">-->
+<!--        <button type="submit" name="summonerName" value="result.name">더 보기</button>-->
+<!--    </form>-->
+
 </div>
 
 </body>

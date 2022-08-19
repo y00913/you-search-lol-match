@@ -58,14 +58,14 @@ public class SummonerService {
         return result;
     }
 
-    public List<String> callMatchHistory(String puuid) {
+    public List<String> callMatchHistory(String puuid, int start) {
         List<String> result = new ArrayList();
 
         String url = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/";
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url + puuid + "/ids?start=0&count=7&api_key=" + myKey);
+            HttpGet request = new HttpGet(url + puuid + "/ids?start=" + start + "&count=5&api_key=" + myKey);
 
             HttpResponse response = client.execute(request);
 
@@ -121,7 +121,7 @@ public class SummonerService {
             HttpGet request = new HttpGet(url);
             HttpResponse response = client.execute(request);
 
-            if(response.getStatusLine().getStatusCode() == 200) {
+            if (response.getStatusLine().getStatusCode() == 200) {
                 ResponseHandler<String> handler = new BasicResponseHandler();
                 String body = handler.handleResponse(response);
 
@@ -137,33 +137,40 @@ public class SummonerService {
                 if (timestamp >= 24) {
                     String endTime = Math.round(timestamp / 24) + "일 전";
                     matchDTO.setEndTime(endTime);
-                } else {
+                } else if (timestamp * 24 >= 60) {
                     String endTime = Math.round(timestamp) + "시간 전";
+                    matchDTO.setEndTime(endTime);
+                } else {
+                    String endTime = Math.round(timestamp) + "분 전";
                     matchDTO.setEndTime(endTime);
                 }
 
 
                 Long gameDuration = Long.parseLong(info.get("gameDuration").toString());
-                matchDTO.setGameDurationMinutes(gameDuration/60);
-                matchDTO.setGameDurationSeconds(gameDuration%60);
+                matchDTO.setGameDurationMinutes(gameDuration / 60);
+                matchDTO.setGameDurationSeconds(gameDuration % 60);
 
                 List<MatchUserInfoDTO> matchUserInfoDTOs = new ArrayList<>();
                 MyInfoDTO myInfoDTO = new MyInfoDTO();
-                for(int i=0;i<participants.size();i++){
+                for (int i = 0; i < participants.size(); i++) {
                     JSONObject participant = (JSONObject) participants.get(i);
                     MatchUserInfoDTO matchUserInfoDTO = new MatchUserInfoDTO();
 
                     matchUserInfoDTO.setSummonerName(participant.get("summonerName").toString());
 
-                    if(participant.get("summonerName").toString().equalsIgnoreCase(summonerName)) {
+                    if (participant.get("summonerName").toString().equalsIgnoreCase(summonerName)) {
                         matchDTO.setWin((boolean) participant.get("win"));
                         myInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
 
                         List<String> myItems = new ArrayList<>();
-                        for(int j=0;j<=6;j++){
+                        for (int j = 0; j <= 6; j++) {
                             myItems.add(iconService.callItemIcon(participant.get("item" + j).toString()));
                         }
                         myInfoDTO.setItems(myItems);
+
+                        myInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
+                        myInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
+                        myInfoDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
                     }
                     matchUserInfoDTO.setWin((boolean) participant.get("win"));
                     matchUserInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
@@ -175,7 +182,7 @@ public class SummonerService {
 
                     List<String> items = new ArrayList<>();
 
-                    for(int j=0;j<=6;j++){
+                    for (int j = 0; j <= 6; j++) {
                         items.add(iconService.callItemIcon(participant.get("item" + j).toString()));
                     }
 
@@ -188,7 +195,7 @@ public class SummonerService {
                     JSONArray primarySelections = (JSONArray) primaryStyle.get("selections");
                     JSONObject primarySelectionsNumber = (JSONObject) primarySelections.get(0);
 
-                    if(participant.get("summonerName").toString().equalsIgnoreCase(summonerName)){
+                    if (participant.get("summonerName").toString().equalsIgnoreCase(summonerName)) {
                         myInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
                         myInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
                     }
