@@ -17,4 +17,6 @@ public class MyInfoDTO {
     private int kills;
     private int deaths;
     private int assists;
+    private String spell1Id;
+    private String spell2Id;
 }

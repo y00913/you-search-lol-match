@@ -15,6 +15,7 @@
             min-height: 70vh;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
 </head>
 <body>
 
@@ -22,8 +23,8 @@
     <h1>
         <p>Search Match</p>
     </h1>
-    <form th:action="@{/}" method="post" autocomplete="on">
-        <input type="text" name="summonerName" style="width: 400px; height: 20px" placeholder="닉네임" required autofocus>
+    <form th:action="@{/search}" method="get" autocomplete="on">
+        <input type="text" name="summonerName" style="width: 400px; height: 20px" placeholder="닉네임" required>
         <button type="submit">검색</button>
     </form>
 

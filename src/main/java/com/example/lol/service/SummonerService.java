@@ -171,6 +171,8 @@ public class SummonerService {
                         myInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
                         myInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
                         myInfoDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
+                        myInfoDTO.setSpell1Id(iconService.callSpellIcon(participant.get("summoner1Id").toString()));
+                        myInfoDTO.setSpell2Id(iconService.callSpellIcon(participant.get("summoner2Id").toString()));
                     }
                     matchUserInfoDTO.setWin((boolean) participant.get("win"));
                     matchUserInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
@@ -202,6 +204,8 @@ public class SummonerService {
 
                     matchUserInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
                     matchUserInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
+                    matchUserInfoDTO.setSpell1Id(iconService.callSpellIcon(participant.get("summoner1Id").toString()));
+                    matchUserInfoDTO.setSpell2Id(iconService.callSpellIcon(participant.get("summoner2Id").toString()));
 
                     matchUserInfoDTOs.add(matchUserInfoDTO);
                 }

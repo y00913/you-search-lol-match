@@ -9,7 +9,7 @@
     <h1>
         <p>Search Match</p>
     </h1>
-    <form th:action="@{/}" method="post" autocomplete="on">
+    <form th:action="@{/search}" method="get" autocomplete="on">
         <input type="text" name="summonerName" style="width: 400px; height: 20px" placeholder="닉네임" required>
         <button type="submit">검색</button>
     </form>
@@ -60,140 +60,46 @@
         <th:blcok th:if="${#lists.isEmpty(leagueEntry)}">
             <h2>Unranked</h2>
         </th:blcok>
-
-        <br>
-
-        <th:block th:if="${!#lists.isEmpty(matches)}">
-            <table>
-                <tr th:each="match : ${matches}">
-                    <td style="text-align: center; padding: 30px 0 30px 0">
-                        <h3>
-                            <span th:if="${match.gameMode == 'ARAM'}">무작위 총력전 </span>
-                            <span th:if="${match.gameMode == 'CLASSIC'}"> 소환사 협곡 </span>
-                            <span th:text="${match.endTime}"></span>
-                            <p>
-                                <span th:if="${match.win == true}" style="color: blue">
-                                    승리
-                                </span>
-                                <span th:if="${match.win == false}" style="color: red">
-                                    패배
-                                </span>
-                                <span th:text="${match.gameDurationMinutes}"></span>분
-                                <span th:text="${match.gameDurationSeconds}"></span>초
-                            </p>
-                        </h3>
-
-                        <table style="margin-left: auto; margin-right: auto">
-                            <tr>
-                                <td>
-                                    <img th:src="${match.myInfoDTO.championName}" width="100"
-                                         style="border-radius: 70px">
-                                </td>
-                                <td>
-                                    <div style="vertical-align: top">
-                                        <img th:src="${match.myInfoDTO.primaryPerk}" width="40"
-                                             style="background-color: black; border-radius: 70px">
-                                    </div>
-                                    <div style="vertical-align: bottom">
-                                        <img th:src="${match.myInfoDTO.subPerk}" width="40">
-                                    </div>
-                                </td>
-                                <td>
-                                    <div style="vertical-align: top">
-                                        <h2>
-                                            <span th:text="${match.myInfoDTO.kills}"></span> /
-                                            <span th:text="${match.myInfoDTO.deaths}"></span> /
-                                            <span th:text="${match.myInfoDTO.assists}"></span>
-                                        </h2>
-                                    </div>
-
-                                    <div style="vertical-align: bottom">
-                                        <th:block th:each="item : ${match.myInfoDTO.items}">
-                                            <img th:src="${item}" width="30">
-                                        </th:block>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-
-
-                        <details>
-                            <summary style="cursor: pointer"> 상세보기</summary>
-                            <table style="border: solid black 1px">
-                                <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th></th>
-                                    <th>KDA</th>
-                                    <th>cs</th>
-                                    <th>피해량</th>
-                                    <th>아이탬</th>
-                                </tr>
-
-                                <tr th:each="userInfo : ${match.matchUserInfoDTOs}">
-                                    <td><img th:src="${userInfo.championName}" width="40"
-                                             style="border-radius: 70px">
-                                    </td>
-                                    <td>
-                                        <div style="vertical-align: top">
-                                            <img th:src="${userInfo.primaryPerk}" width="20"
-                                                 style="background-color: black; border-radius: 70px">
-                                        </div>
-                                        <div style="vertical-align: bottom">
-                                            <img th:src="${userInfo.subPerk}" width="20">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <th:block th:if="${userInfo.win == true}">
-                                            <p th:text="${userInfo.summonerName}"
-                                               style="color: blue; font-weight: bold"></p>
-                                        </th:block>
-                                        <th:block th:if="${userInfo.win == false}">
-                                            <p th:text="${userInfo.summonerName}"
-                                               style="color: red; font-weight: bold"></p>
-                                        </th:block>
-                                    </td>
-                                    <td style="text-align: center">
-                                        <span th:text="${userInfo.kills}" style="font-weight: bold"></span> /
-                                        <span th:text="${userInfo.deaths}" style="font-weight: bold"></span> /
-                                        <span th:text="${userInfo.assists}" style="font-weight: bold"></span>
-                                    </td>
-
-
-                                    <td style="text-align: center">
-                                            <span th:text="${userInfo.totalMinionsKilled}"
-                                                  style="font-weight: bold"></span>
-                                    </td>
-                                    <td style="text-align: center">
-                                    <span th:text="${userInfo.totalDamageDealtToChampions}"
-                                          style="font-weight: bold"></span>
-                                    </td>
-                                    <td>
-                                        <th:block th:each="item : ${userInfo.items}">
-                                            <img th:src="${item}" width="30">
-                                        </th:block>
-                                    </td>
-                                </tr>
-                            </table>
-                        </details>
-                    </td>
-                </tr>
-            </table>
-        </th:block>
-
     </th:block>
     <th:block th:if="${result == null}">
         <h2>
             잘못된 소환사 이름입니다. 다시 입력하세요.
         </h2>
     </th:block>
+</div>
+
+<div id="match-table"></div>
+
+
+<div align="center">
+    <div id="loading"> <img src="https://blog.kakaocdn.net/dn/bVlxDK/btq6lZaZ9u5/tt3SQWLkf692DbCsQMJS0k/img.gif"> </div>
+    
     <br>
 
-<!--    <form th:action="@{/}" method="post">-->
-<!--        <button type="submit" name="summonerName" value="result.name">더 보기</button>-->
-<!--    </form>-->
-
+    <button type="button" th:onclick="callPastMatch([[${result.name}]])">더 보기</button>
 </div>
+
+
+<script>
+    let start = 0;
+
+    function callPastMatch(summonerName) {
+        $.ajax({
+            url: '/' + summonerName + '/' + start,
+            type: 'GET',
+            beforeSend: function(){
+                $('#loading').show();
+            },
+            complete: function(){
+                $('#loading').hide();
+            },
+        }).done(function (result) {
+            $("#match-table").replaceWith(result);
+            alert('더 보기 완료 ' + start);
+            start = parseInt(start) + 5;
+        });
+    }
+</script>
 
 </body>
 </html>

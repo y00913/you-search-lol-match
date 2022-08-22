@@ -26,8 +26,8 @@ public class SummonerApiController {
         return result;
     }
 
-    @PostMapping("/match")
-    public List<MatchDTO> callMatchDTO(@RequestParam String summonerName, @RequestParam int start) {
+    @GetMapping("/match/{summonerName}/{start}")
+    public List<MatchDTO> callMatchDTO(@PathVariable String summonerName, @PathVariable int start) {
         List<MatchDTO> matchDTOs = new ArrayList<>();
         String summonerNameRepl = summonerName.replaceAll(" ","%20");
         SummonerDTO summonerDTO = summonerService.callRiotAPISummonerByName(summonerNameRepl);
@@ -38,7 +38,7 @@ public class SummonerApiController {
             matchDTOs.add(matchDTO);
         }
 
-        System.out.println(summonerName);
+        System.out.println(matchDTOs.get(0).toString());
 
         return matchDTOs;
     }

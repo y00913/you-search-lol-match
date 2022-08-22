@@ -9,9 +9,7 @@ import com.example.lol.service.SummonerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,27 +30,39 @@ public class IndexController {
         return "index";
     }
 
-    @PostMapping
-    public String postResult(String summonerName, Model model){
+    @GetMapping("/search")
+    public String getResult(String summonerName, Model model){
         String summonerNameRepl = summonerName.replaceAll(" ","%20");
+        SummonerDTO summonerDTO = summonerService.callRiotAPISummonerByName(summonerNameRepl);
 
-        SummonerDTO result = summonerService.callRiotAPISummonerByName(summonerNameRepl);
-        model.addAttribute("result",result);
+        model.addAttribute("result",summonerDTO);
 
-        if(result != null) {
-            String iconUrl = iconService.callSummonerIcon(result.getProfileIconId());
-            model.addAttribute("iconUrl",iconUrl);
+        if(summonerDTO != null) {
+            String iconUrl = iconService.callSummonerIcon(summonerDTO.getProfileIconId());
+            model.addAttribute("iconUrl", iconUrl);
 
-            List<LeagueEntryDTO> leagueEntry = summonerService.callLeagueEntry(result.getId());
-            model.addAttribute("leagueEntry",leagueEntry);
+            List<LeagueEntryDTO> leagueEntry = summonerService.callLeagueEntry(summonerDTO.getId());
+            model.addAttribute("leagueEntry", leagueEntry);
 
-            if(leagueEntry.size() != 0) {
+            if (leagueEntry.size() != 0) {
                 model.addAttribute("tierUrl", iconService.callTierIcon(leagueEntry.get(0).getTier()));
             }
+        }
 
-            List<String> matchHistory = summonerService.callMatchHistory(result.getPuuid(), 0);
+        return "result";
+    }
 
-            System.out.println(result);
+    @GetMapping("/{summonerName}/{start}")
+    public String callMatchTable(@PathVariable String summonerName, @PathVariable int start, Model model) {
+        String summonerNameRepl = summonerName.replaceAll(" ","%20");
+        SummonerDTO summonerDTO = summonerService.callRiotAPISummonerByName(summonerNameRepl);
+
+        model.addAttribute("result",summonerDTO);
+
+        if(summonerDTO != null) {
+            List<String> matchHistory = summonerService.callMatchHistory(summonerDTO.getPuuid(), start  );
+
+            System.out.println(summonerDTO);
             System.out.println(matchHistory);
 
             List<MatchDTO> matchDTOs = new ArrayList<>();
@@ -63,9 +73,11 @@ public class IndexController {
             }
 
             model.addAttribute("matches",matchDTOs);
+
+            System.out.println(matchDTOs.get(0).toString());
         }
 
-        return "result";
+        return "table";
     }
 
 }

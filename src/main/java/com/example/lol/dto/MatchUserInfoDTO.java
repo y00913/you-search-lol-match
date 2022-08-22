@@ -21,4 +21,6 @@ public class MatchUserInfoDTO {
     private List<String> items;
     private String primaryPerk;
     private String subPerk;
+    private String spell1Id;
+    private String spell2Id;
 }
