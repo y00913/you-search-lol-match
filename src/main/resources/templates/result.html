@@ -60,43 +60,46 @@
         <th:blcok th:if="${#lists.isEmpty(leagueEntry)}">
             <h2>Unranked</h2>
         </th:blcok>
+
+        <div id="match-table" th:onclick="callPastMatch([[${result.name}]], 0)"></div>
+
+        <div id="loading"><img src="https://blog.kakaocdn.net/dn/bVlxDK/btq6lZaZ9u5/tt3SQWLkf692DbCsQMJS0k/img.gif"></div>
+
+        <br>
+
+        <button type="button" id="resultButton" th:onclick="callPastMatch([[${result.name}]])">더 보기</button>
     </th:block>
+
     <th:block th:if="${result == null}">
         <h2>
             잘못된 소환사 이름입니다. 다시 입력하세요.
         </h2>
     </th:block>
+
 </div>
-
-<div id="match-table"></div>
-
-
-<div align="center">
-    <div id="loading"> <img src="https://blog.kakaocdn.net/dn/bVlxDK/btq6lZaZ9u5/tt3SQWLkf692DbCsQMJS0k/img.gif"> </div>
-    
-    <br>
-
-    <button type="button" th:onclick="callPastMatch([[${result.name}]])">더 보기</button>
-</div>
-
 
 <script>
     let start = 0;
 
+    window.onload = function () {
+        $('#loading').hide();
+    }
+
     function callPastMatch(summonerName) {
         $.ajax({
+            beforeSend: function () {
+                $('#loading').show();
+                $('#resultButton').hide();
+            },
             url: '/' + summonerName + '/' + start,
             type: 'GET',
-            beforeSend: function(){
-                $('#loading').show();
-            },
-            complete: function(){
+            complete: function () {
                 $('#loading').hide();
+                $('#resultButton').show();
             },
         }).done(function (result) {
-            $("#match-table").replaceWith(result);
-            alert('더 보기 완료 ' + start);
-            start = parseInt(start) + 5;
+            $('#match-table').replaceWith(result);
+            start = start + 5;
         });
     }
 </script>

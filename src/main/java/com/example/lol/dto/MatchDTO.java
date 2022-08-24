@@ -10,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MatchDTO {
+    private String matchId;
     private List<MatchUserInfoDTO> matchUserInfoDTOs;
     private Long gameDurationMinutes;
     private Long gameDurationSeconds;

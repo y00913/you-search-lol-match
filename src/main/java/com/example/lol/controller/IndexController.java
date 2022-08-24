@@ -65,12 +65,7 @@ public class IndexController {
             System.out.println(summonerDTO);
             System.out.println(matchHistory);
 
-            List<MatchDTO> matchDTOs = new ArrayList<>();
-
-            for(String match : matchHistory) {
-                MatchDTO matchDTO = summonerService.callMatchAbout(match, summonerName);
-                matchDTOs.add(matchDTO);
-            }
+            List<MatchDTO> matchDTOs = summonerService.callMatchAbout(matchHistory,summonerName);
 
             model.addAttribute("matches",matchDTOs);
 
@@ -78,6 +73,17 @@ public class IndexController {
         }
 
         return "table";
+    }
+
+    @GetMapping("/detail/{matchId}")
+    public String callDeatilMatchTable(@PathVariable String matchId, Model model) {
+        MatchDTO matchDTO = summonerService.callDetailMatch(matchId);
+
+        model.addAttribute("match",matchDTO);
+
+        System.out.println(matchId);
+
+        return "detail-table";
     }
 
 }

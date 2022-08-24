@@ -65,7 +65,7 @@ public class SummonerService {
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url + puuid + "/ids?start=" + start + "&count=5&api_key=" + myKey);
+            HttpGet request = new HttpGet(url + puuid + "/ids?start=" + start + "&count=10&api_key=" + myKey);
 
             HttpResponse response = client.execute(request);
 
@@ -111,7 +111,98 @@ public class SummonerService {
         return result;
     }
 
-    public MatchDTO callMatchAbout(String matchId, String summonerName) {
+    public List<MatchDTO> callMatchAbout(List<String> matchHistory, String summonerName) {
+        List<MatchDTO> matchDTOs = new ArrayList<>();
+
+        for(String matchId : matchHistory) {
+            String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + myKey;
+            MatchDTO matchDTO = new MatchDTO();
+            IconService iconService = new IconService();
+
+            matchDTO.setMatchId(matchId);
+
+            try {
+                HttpClient client = HttpClientBuilder.create().build();
+                HttpGet request = new HttpGet(url);
+                HttpResponse response = client.execute(request);
+
+                if (response.getStatusLine().getStatusCode() == 200) {
+                    ResponseHandler<String> handler = new BasicResponseHandler();
+                    String body = handler.handleResponse(response);
+
+                    JSONParser jsonParser = new JSONParser();
+                    JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+                    JSONObject info = (JSONObject) jsonObject.get("info");
+                    JSONArray participants = (JSONArray) info.get("participants");
+
+                    matchDTO.setGameMode(info.get("gameMode").toString());
+
+                    long timestamp = (System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString())) / 1000 / 60 / 60;
+
+                    if (timestamp >= 24) {
+                        String endTime = Math.round(timestamp / 24) + "일 전";
+                        matchDTO.setEndTime(endTime);
+                    } else if (timestamp * 24 >= 60) {
+                        String endTime = Math.round(timestamp) + "시간 전";
+                        matchDTO.setEndTime(endTime);
+                    } else {
+                        String endTime = Math.round(timestamp) + "분 전";
+                        matchDTO.setEndTime(endTime);
+                    }
+
+
+                    Long gameDuration = Long.parseLong(info.get("gameDuration").toString());
+                    matchDTO.setGameDurationMinutes(gameDuration / 60);
+                    matchDTO.setGameDurationSeconds(gameDuration % 60);
+
+                    MyInfoDTO myInfoDTO = new MyInfoDTO();
+                    for (int i = 0; i < participants.size(); i++) {
+                        JSONObject participant = (JSONObject) participants.get(i);
+
+                        if (participant.get("summonerName").toString().equalsIgnoreCase(summonerName)) {
+                            matchDTO.setWin((boolean) participant.get("win"));
+                            myInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
+
+                            List<String> myItems = new ArrayList<>();
+                            for (int j = 0; j <= 6; j++) {
+                                myItems.add(iconService.callItemIcon(participant.get("item" + j).toString()));
+                            }
+                            myInfoDTO.setItems(myItems);
+
+                            myInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
+                            myInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
+                            myInfoDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
+                            myInfoDTO.setSpell1Id(iconService.callSpellIcon(participant.get("summoner1Id").toString()));
+                            myInfoDTO.setSpell2Id(iconService.callSpellIcon(participant.get("summoner2Id").toString()));
+
+                            JSONObject perks = (JSONObject) participant.get("perks");
+                            JSONArray styles = (JSONArray) perks.get("styles");
+                            JSONObject primaryStyle = (JSONObject) styles.get(0);
+                            JSONObject subStyle = (JSONObject) styles.get(1);
+                            JSONArray primarySelections = (JSONArray) primaryStyle.get("selections");
+                            JSONObject primarySelectionsNumber = (JSONObject) primarySelections.get(0);
+
+                            myInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
+                            myInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
+                        }
+                    }
+
+                    matchDTO.setMyInfoDTO(myInfoDTO);
+                } else {
+                    System.out.println("error : " + response.getStatusLine().getStatusCode());
+                }
+            } catch (ParseException | IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            matchDTOs.add(matchDTO);
+        }
+
+        return matchDTOs;
+    }
+
+    public MatchDTO callDetailMatch(String matchId){
         String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + myKey;
         MatchDTO matchDTO = new MatchDTO();
         IconService iconService = new IconService();
@@ -130,50 +221,13 @@ public class SummonerService {
                 JSONObject info = (JSONObject) jsonObject.get("info");
                 JSONArray participants = (JSONArray) info.get("participants");
 
-                matchDTO.setGameMode(info.get("gameMode").toString());
-
-                long timestamp = (System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString())) / 1000 / 60 / 60;
-
-                if (timestamp >= 24) {
-                    String endTime = Math.round(timestamp / 24) + "일 전";
-                    matchDTO.setEndTime(endTime);
-                } else if (timestamp * 24 >= 60) {
-                    String endTime = Math.round(timestamp) + "시간 전";
-                    matchDTO.setEndTime(endTime);
-                } else {
-                    String endTime = Math.round(timestamp) + "분 전";
-                    matchDTO.setEndTime(endTime);
-                }
-
-
-                Long gameDuration = Long.parseLong(info.get("gameDuration").toString());
-                matchDTO.setGameDurationMinutes(gameDuration / 60);
-                matchDTO.setGameDurationSeconds(gameDuration % 60);
-
                 List<MatchUserInfoDTO> matchUserInfoDTOs = new ArrayList<>();
-                MyInfoDTO myInfoDTO = new MyInfoDTO();
                 for (int i = 0; i < participants.size(); i++) {
                     JSONObject participant = (JSONObject) participants.get(i);
                     MatchUserInfoDTO matchUserInfoDTO = new MatchUserInfoDTO();
 
                     matchUserInfoDTO.setSummonerName(participant.get("summonerName").toString());
 
-                    if (participant.get("summonerName").toString().equalsIgnoreCase(summonerName)) {
-                        matchDTO.setWin((boolean) participant.get("win"));
-                        myInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
-
-                        List<String> myItems = new ArrayList<>();
-                        for (int j = 0; j <= 6; j++) {
-                            myItems.add(iconService.callItemIcon(participant.get("item" + j).toString()));
-                        }
-                        myInfoDTO.setItems(myItems);
-
-                        myInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
-                        myInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
-                        myInfoDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
-                        myInfoDTO.setSpell1Id(iconService.callSpellIcon(participant.get("summoner1Id").toString()));
-                        myInfoDTO.setSpell2Id(iconService.callSpellIcon(participant.get("summoner2Id").toString()));
-                    }
                     matchUserInfoDTO.setWin((boolean) participant.get("win"));
                     matchUserInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
                     matchUserInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
@@ -197,11 +251,6 @@ public class SummonerService {
                     JSONArray primarySelections = (JSONArray) primaryStyle.get("selections");
                     JSONObject primarySelectionsNumber = (JSONObject) primarySelections.get(0);
 
-                    if (participant.get("summonerName").toString().equalsIgnoreCase(summonerName)) {
-                        myInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
-                        myInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
-                    }
-
                     matchUserInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
                     matchUserInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
                     matchUserInfoDTO.setSpell1Id(iconService.callSpellIcon(participant.get("summoner1Id").toString()));
@@ -210,7 +259,6 @@ public class SummonerService {
                     matchUserInfoDTOs.add(matchUserInfoDTO);
                 }
 
-                matchDTO.setMyInfoDTO(myInfoDTO);
                 matchDTO.setMatchUserInfoDTOs(matchUserInfoDTOs);
             } else {
                 System.out.println("error : " + response.getStatusLine().getStatusCode());

@@ -28,17 +28,11 @@ public class SummonerApiController {
 
     @GetMapping("/match/{summonerName}/{start}")
     public List<MatchDTO> callMatchDTO(@PathVariable String summonerName, @PathVariable int start) {
-        List<MatchDTO> matchDTOs = new ArrayList<>();
         String summonerNameRepl = summonerName.replaceAll(" ","%20");
         SummonerDTO summonerDTO = summonerService.callRiotAPISummonerByName(summonerNameRepl);
 
         List<String> matchHistory = summonerService.callMatchHistory(summonerDTO.getPuuid(), start);
-        for(String match : matchHistory) {
-            MatchDTO matchDTO = summonerService.callMatchAbout(match, summonerName);
-            matchDTOs.add(matchDTO);
-        }
-
-        System.out.println(matchDTOs.get(0).toString());
+        List<MatchDTO> matchDTOs = summonerService.callMatchAbout(matchHistory,summonerName);
 
         return matchDTOs;
     }

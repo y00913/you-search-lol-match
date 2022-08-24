@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <div th:replace="index :: fragment-header"></div>
+</head>
+<body>
+
+<table style="border: solid black 1px" id="show">
+    <tr>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th>KDA</th>
+        <th>cs</th>
+        <th>피해량</th>
+        <th>아이탬</th>
+    </tr>
+
+    <tr th:each="userInfo : ${match.matchUserInfoDTOs}">
+        <td><img th:src="${userInfo.championName}" width="40"
+                 style="border-radius: 70px">
+        </td>
+        <td>
+            <div style="vertical-align: top">
+                <img th:src="${userInfo.spell1Id}" width="20">
+            </div>
+            <div style="vertical-align: bottom">
+                <img th:src="${userInfo.spell2Id}" width="20">
+            </div>
+        </td>
+        <td>
+            <div style="vertical-align: top">
+                <img th:src="${userInfo.primaryPerk}" width="20"
+                     style="background-color: black; border-radius: 70px">
+            </div>
+            <div style="vertical-align: bottom">
+                <img th:src="${userInfo.subPerk}" width="20">
+            </div>
+        </td>
+        <td>
+            <th:block th:if="${userInfo.win == true}">
+                <p th:text="${userInfo.summonerName}"
+                   style="color: blue; font-weight: bold"></p>
+            </th:block>
+            <th:block th:if="${userInfo.win == false}">
+                <p th:text="${userInfo.summonerName}"
+                   style="color: red; font-weight: bold"></p>
+            </th:block>
+        </td>
+        <td style="text-align: center">
+            <span th:text="${userInfo.kills}" style="font-weight: bold"></span> /
+            <span th:text="${userInfo.deaths}" style="font-weight: bold"></span> /
+            <span th:text="${userInfo.assists}" style="font-weight: bold"></span>
+        </td>
+
+
+        <td style="text-align: center">
+                                            <span th:text="${userInfo.totalMinionsKilled}"
+                                                  style="font-weight: bold"></span>
+        </td>
+        <td style="text-align: center">
+                                    <span th:text="${userInfo.totalDamageDealtToChampions}"
+                                          style="font-weight: bold"></span>
+        </td>
+        <td>
+            <th:block th:each="item : ${userInfo.items}">
+                <img th:src="${item}" width="30">
+            </th:block>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
