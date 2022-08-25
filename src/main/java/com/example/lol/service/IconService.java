@@ -12,11 +12,10 @@ import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 @Service
 public class IconService {
-    public String callSummonerIcon(int profileIconId) {
+    public String callSummonerIcon(String profileIconId) {
         String url = "https://ddragon.leagueoflegends.com/cdn/12.15.1/img/profileicon/" + profileIconId + ".png";
 
         return url;

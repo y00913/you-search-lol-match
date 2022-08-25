@@ -5,120 +5,122 @@
 </head>
 <body>
 
-<div align="center">
-    <th:block th:if="${result != null}">
-        <br>
-
-        <div>
-            <th:block th:if="${!#lists.isEmpty(matches)}">
-                <table>
-                    <tr th:each="match, num : ${matches}">
-                        <td style="text-align: center; padding: 30px 0 30px 0">
-                            <h3>
-                                <span th:if="${match.gameMode == 'ARAM'}">무작위 총력전 </span>
-                                <span th:if="${match.gameMode == 'CLASSIC'}"> 소환사 협곡 </span>
-                                <span th:text="${match.endTime}"></span>
-                                <p>
+<th:block th:if="${result != null}">
+    <div>
+        <th:block th:if="${!#lists.isEmpty(matches)}">
+            <table align="center">
+                <tr th:each="match: ${matches}">
+                    <td style="text-align: center; padding: 30px 0 30px 0">
+                        <h3>
+                            <span th:if="${match.gameMode == 'ARAM'}">무작위 총력전 </span>
+                            <span th:if="${match.gameMode == 'CLASSIC'}"> 소환사 협곡 </span>
+                            <span th:if="${match.gameMode == 'URF'}"> 우르프 </span>
+                            <span th:if="${match.gameMode == 'KINGPORO'}"> 포로왕의 전설 </span>
+                            <span th:if="${match.gameMode == 'SIEGE'}"> 돌격 넥서스 </span>
+                            <span th:if="${match.gameMode == 'ONEFORALL'}"> 단일 챔피언 </span>
+                            <span th:text="${match.endTime}"></span>
+                            <p>
                                 <span th:if="${match.win == true}" style="color: blue">
                                     승리
                                 </span>
-                                    <span th:if="${match.win == false}" style="color: red">
+                                <span th:if="${match.win == false}" style="color: red">
                                     패배
                                 </span>
-                                    <span th:text="${match.gameDurationMinutes}"></span>분
-                                    <span th:text="${match.gameDurationSeconds}"></span>초
-                                </p>
-                            </h3>
+                                <span th:text="${match.gameDurationMinutes}"></span>분
+                                <span th:text="${match.gameDurationSeconds}"></span>초
+                            </p>
+                        </h3>
 
-                            <table style="margin-left: auto; margin-right: auto">
-                                <tr>
-                                    <td>
-                                        <img th:src="${match.myInfoDTO.championName}" width="100"
-                                             style="border-radius: 70px">
-                                    </td>
-                                    <td>
-                                        <div style="vertical-align: top">
-                                            <img th:src="${match.myInfoDTO.spell1Id}" width="40">
-                                        </div>
-                                        <div style="vertical-align: bottom">
-                                            <img th:src="${match.myInfoDTO.spell2Id}" width="40">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div style="vertical-align: top">
-                                            <img th:src="${match.myInfoDTO.primaryPerk}" width="40"
-                                                 style="background-color: black; border-radius: 70px">
-                                        </div>
-                                        <div style="vertical-align: bottom">
-                                            <img th:src="${match.myInfoDTO.subPerk}" width="40">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div style="vertical-align: top">
-                                            <h2>
-                                                <span th:text="${match.myInfoDTO.kills}"></span> /
-                                                <span th:text="${match.myInfoDTO.deaths}"></span> /
-                                                <span th:text="${match.myInfoDTO.assists}"></span>
-                                            </h2>
-                                        </div>
+                        <table style="margin-left: auto; margin-right: auto">
+                            <tr>
+                                <td>
+                                    <img th:src="${match.myInfoDTO.championName}" width="100"
+                                         style="border-radius: 70px">
+                                </td>
+                                <td>
+                                    <div style="vertical-align: top">
+                                        <img th:src="${match.myInfoDTO.spell1Id}" width="40">
+                                    </div>
+                                    <div style="vertical-align: bottom">
+                                        <img th:src="${match.myInfoDTO.spell2Id}" width="40">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="vertical-align: top">
+                                        <img th:src="${match.myInfoDTO.primaryPerk}" width="40"
+                                             style="background-color: black; border-radius: 70px">
+                                    </div>
+                                    <div style="vertical-align: bottom">
+                                        <img th:src="${match.myInfoDTO.subPerk}" width="40">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div style="vertical-align: top">
+                                        <h2>
+                                            <span th:text="${match.myInfoDTO.kills}"></span> /
+                                            <span th:text="${match.myInfoDTO.deaths}"></span> /
+                                            <span th:text="${match.myInfoDTO.assists}"></span>
+                                        </h2>
+                                    </div>
 
-                                        <div style="vertical-align: bottom">
-                                            <th:block th:each="item : ${match.myInfoDTO.items}">
-                                                <img th:src="${item}" width="30">
-                                            </th:block>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
+                                    <div style="vertical-align: bottom">
+                                        <th:block th:each="item : ${match.myInfoDTO.items}">
+                                            <img th:src="${item}" width="30">
+                                        </th:block>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
 
-                            <button type="button" th:id="'call' + ${num.index}" th:onclick="callDetailMatch([[${match.matchId}]], [[${num.index}]])">상세보기</button>
-                            
-                            <div th:id="'loading' + ${num.index}" style="display: none">
-                                <img src="https://blog.kakaocdn.net/dn/bVlxDK/btq6lZaZ9u5/tt3SQWLkf692DbCsQMJS0k/img.gif"> 
-                            </div>
-                            
-                            <button type="button" style="display:none;" th:id="'showDetail' + ${num.index}" th:onclick="showDetail([[${num.index}]])">숨기기</button>
+                        <button type="button" th:id="'call' + ${match.matchId}"
+                                th:onclick="callDetailMatch([[${match.matchId}]])">상세보기
+                        </button>
 
-                            <div th:id="showD + ${num.index}">
-                                <div th:id="'detail' + ${num.index}" align="center"></div>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            </th:block>
-        </div>
-    </th:block>
+                        <div th:id="'loading' + ${match.matchId}" style="display: none">
+                            <img src="https://blog.kakaocdn.net/dn/bVlxDK/btq6lZaZ9u5/tt3SQWLkf692DbCsQMJS0k/img.gif">
+                        </div>
 
-    <br>
-</div>
+                        <button type="button" style="display:none;" th:id="'showDetail' + ${match.matchId}"
+                                th:onclick="showDetail([[${match.matchId}]])">숨기기
+                        </button>
+
+                        <div th:id="showD + ${match.matchId}">
+                            <div th:id="'detail' + ${match.matchId}" align="center"></div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </th:block>
+    </div>
+</th:block>
 
 <script>
-    function callDetailMatch(matchId, index) {
+    function callDetailMatch(matchId) {
         $.ajax({
             url: '/detail' + '/' + matchId,
             type: 'GET',
             beforeSend: function () {
-                $('#loading' + index).show();
-                $('#call' + index).hide();
-                $('#showDetail' + index).hide();
+                $('#loading' + matchId).show();
+                $('#call' + matchId).hide();
+                $('#showDetail' + matchId).hide();
             },
             complete: function () {
-                $('#loading' + index).hide();
-                $('#call' + index).hide();
-                $('#showDetail' + index).show();
+                $('#loading' + matchId).hide();
+                $('#call' + matchId).hide();
+                $('#showDetail' + matchId).show();
             },
         }).done(function (result) {
-            $('#detail' + index).replaceWith(result);
+            $('#detail' + matchId).replaceWith(result);
         });
     }
 
-    function showDetail(index){
-        if($('#showD' + index).is(":visible")) {
-            $('#showD' + index).hide();
-            $('#showDetail' + index).text('상세보기');
+    function showDetail(matchId) {
+        if ($('#showD' + matchId).is(":visible")) {
+            $('#showD' + matchId).hide();
+            $('#showDetail' + matchId).text('상세보기');
         } else {
-            $('#showD' + index).show();
-            $('#showDetail' + index).text('숨기기');
+            $('#showD' + matchId).show();
+            $('#showDetail' + matchId).text('숨기기');
         }
     }
 </script>

@@ -2,7 +2,6 @@ package com.example.lol.controller;
 
 import com.example.lol.dto.LeagueEntryDTO;
 import com.example.lol.dto.MatchDTO;
-import com.example.lol.dto.MatchUserInfoDTO;
 import com.example.lol.dto.SummonerDTO;
 import com.example.lol.service.IconService;
 import com.example.lol.service.SummonerService;
@@ -11,18 +10,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/lol")
 public class IndexController {
 
     @Autowired
     private SummonerService summonerService;
-
-    @Autowired
-    private IconService iconService;
 
     @GetMapping
     public String index(){
@@ -35,18 +30,10 @@ public class IndexController {
         String summonerNameRepl = summonerName.replaceAll(" ","%20");
         SummonerDTO summonerDTO = summonerService.callRiotAPISummonerByName(summonerNameRepl);
 
-        model.addAttribute("result",summonerDTO);
-
-        if(summonerDTO != null) {
-            String iconUrl = iconService.callSummonerIcon(summonerDTO.getProfileIconId());
-            model.addAttribute("iconUrl", iconUrl);
-
-            List<LeagueEntryDTO> leagueEntry = summonerService.callLeagueEntry(summonerDTO.getId());
+        if(summonerDTO.getName() != null) {
+            model.addAttribute("summoner",summonerDTO);
+            LeagueEntryDTO leagueEntry = summonerService.callLeagueEntry(summonerDTO.getId());
             model.addAttribute("leagueEntry", leagueEntry);
-
-            if (leagueEntry.size() != 0) {
-                model.addAttribute("tierUrl", iconService.callTierIcon(leagueEntry.get(0).getTier()));
-            }
         }
 
         return "result";

@@ -29,53 +29,64 @@ import java.util.Set;
 public class SummonerService {
 
     private ObjectMapper objectMapper = new ObjectMapper();
+    private IconService iconService = new IconService();
 
     @Value("${riotApiKey}")
     private String myKey;
 
     public SummonerDTO callRiotAPISummonerByName(String summonerName) {
-        SummonerDTO result;
-
+        SummonerDTO summonerDTO = new SummonerDTO();
         String serverUrl = "https://kr.api.riotgames.com";
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
             HttpGet request = new HttpGet(serverUrl + "/lol/summoner/v4/summoners/by-name/" + summonerName + "?api_key=" + myKey);
-
             HttpResponse response = client.execute(request);
 
-            if (response.getStatusLine().getStatusCode() != 200) {
-                return null;
-            }
+            if (response.getStatusLine().getStatusCode() == 200) {
+                ResponseHandler<String> handler = new BasicResponseHandler();
+                String body = handler.handleResponse(response);
 
-            HttpEntity entity = response.getEntity();
-            result = objectMapper.readValue(entity.getContent(), SummonerDTO.class);
-        } catch (IOException e) {
+                JSONParser jsonParser = new JSONParser();
+                JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+
+                summonerDTO.setName(jsonObject.get("name").toString());
+                summonerDTO.setId(jsonObject.get("id").toString());
+                summonerDTO.setPuuid(jsonObject.get("puuid").toString());
+                summonerDTO.setProfileIcon(iconService.callSummonerIcon(jsonObject.get("profileIconId").toString()));
+                summonerDTO.setSummonerLevel(Long.parseLong(jsonObject.get("summonerLevel").toString()));
+            } else {
+                System.out.println("error : " + response.getStatusLine().getStatusCode());
+            }
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
             return null;
         }
 
-        return result;
+        return summonerDTO;
     }
 
     public List<String> callMatchHistory(String puuid, int start) {
         List<String> result = new ArrayList();
-
         String url = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/";
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url + puuid + "/ids?start=" + start + "&count=10&api_key=" + myKey);
-
+            HttpGet request = new HttpGet(url + puuid + "/ids?start=" + start + "&count=5&api_key=" + myKey);
             HttpResponse response = client.execute(request);
 
-            if (response.getStatusLine().getStatusCode() != 200) {
-                return null;
-            }
+            if (response.getStatusLine().getStatusCode() == 200) {
+                ResponseHandler<String> handler = new BasicResponseHandler();
+                String body = handler.handleResponse(response);
 
-            HttpEntity entity = response.getEntity();
-            result = objectMapper.readValue(entity.getContent(), ArrayList.class);
-        } catch (IOException e) {
+                JSONParser jsonParser = new JSONParser();
+                JSONArray jsonArray = (JSONArray) jsonParser.parse(body);
+
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    result.add(jsonArray.get(i).toString());
+                }
+            }
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
             return null;
         }
@@ -83,41 +94,47 @@ public class SummonerService {
         return result;
     }
 
-    public List<LeagueEntryDTO> callLeagueEntry(String id) {
-        Set<LeagueEntryDTO> tmp = new HashSet<>();
-
+    public LeagueEntryDTO callLeagueEntry(String id) {
+        LeagueEntryDTO leagueEntryDTO = new LeagueEntryDTO();
         String url = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/";
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
             HttpGet request = new HttpGet(url + id + "?api_key=" + myKey);
-
             HttpResponse response = client.execute(request);
 
-            if (response.getStatusLine().getStatusCode() != 200) {
-                return null;
+            if (response.getStatusLine().getStatusCode() == 200) {
+                ResponseHandler<String> handler = new BasicResponseHandler();
+                String body = handler.handleResponse(response);
+
+                JSONParser jsonParser = new JSONParser();
+                JSONArray jsonArray = (JSONArray) jsonParser.parse(body);
+                if (jsonArray.size() != 0) {
+                    JSONObject jsonObject = (JSONObject) jsonArray.get(0);
+
+                    leagueEntryDTO.setTier(jsonObject.get("tier").toString());
+                    leagueEntryDTO.setTierUrl(iconService.callTierIcon(jsonObject.get("tier").toString()));
+                    leagueEntryDTO.setRank(jsonObject.get("rank").toString());
+                    leagueEntryDTO.setLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
+                    leagueEntryDTO.setWins(Integer.parseInt(jsonObject.get("wins").toString()));
+                    leagueEntryDTO.setLosses(Integer.parseInt(jsonObject.get("losses").toString()));
+                }
             }
 
-            HttpEntity entity = response.getEntity();
-            tmp = objectMapper.readValue(entity.getContent(), Set.class);
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
             return null;
         }
 
-        List<LeagueEntryDTO> result = objectMapper.convertValue(tmp, new TypeReference<List<LeagueEntryDTO>>() {
-        });
-
-        return result;
+        return leagueEntryDTO;
     }
 
     public List<MatchDTO> callMatchAbout(List<String> matchHistory, String summonerName) {
         List<MatchDTO> matchDTOs = new ArrayList<>();
 
-        for(String matchId : matchHistory) {
+        for (String matchId : matchHistory) {
             String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + myKey;
             MatchDTO matchDTO = new MatchDTO();
-            IconService iconService = new IconService();
 
             matchDTO.setMatchId(matchId);
 
@@ -202,10 +219,9 @@ public class SummonerService {
         return matchDTOs;
     }
 
-    public MatchDTO callDetailMatch(String matchId){
+    public MatchDTO callDetailMatch(String matchId) {
         String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + myKey;
         MatchDTO matchDTO = new MatchDTO();
-        IconService iconService = new IconService();
 
         try {
             HttpClient client = HttpClientBuilder.create().build();

@@ -18,38 +18,38 @@
 <br><br>
 
 <div align="center">
-    <th:block th:if="${result != null}">
+    <th:block th:if="${summoner != null}">
         <table style="text-align: center">
             <tr>
                 <td>
-                    <img th:src="${iconUrl}" width="150" style="border-radius: 30px">
+                    <img th:src="${summoner.profileIcon}" width="150" style="border-radius: 30px">
                 </td>
                 <td>
                     <h2>
                         <p>
-                            <span th:text="${result.name}"></span>
+                            <span th:text="${summoner.name}"></span>
                         </p>
                         <p>
-                            레벨 : <span th:text="${result.summonerLevel}"></span>
+                            레벨 : <span th:text="${summoner.summonerLevel}"></span>
                         </p>
                     </h2>
                 </td>
             </tr>
             <tr>
-                <th:block th:if="${!#lists.isEmpty(leagueEntry)}">
+                <th:block th:if="${leagueEntry.tier != null}">
                     <td>
-                        <p><img th:src="${tierUrl}" width="150" style="border-radius: 30px"></p>
+                        <p><img th:src="${leagueEntry.tierUrl}" width="150" style="border-radius: 30px"></p>
                     </td>
                     <td>
                         <h2>
                             <p>
-                                <span th:text="${leagueEntry[0].tier}"></span>
-                                <span th:text="${leagueEntry[0].rank}"></span>
-                                <span th:text="${leagueEntry[0].leaguePoints} + 포인트"></span>
+                                <span th:text="${leagueEntry.tier}"></span>
+                                <span th:text="${leagueEntry.rank}"></span>
+                                <span th:text="${leagueEntry.leaguePoints} + 포인트"></span>
                             </p>
                             <p>
-                                <span th:text="${leagueEntry[0].wins}"></span>승
-                                <span th:text="${leagueEntry[0].losses}"></span>패
+                                <span th:text="${leagueEntry.wins}"></span>승
+                                <span th:text="${leagueEntry.losses}"></span>패
                             </p>
                         </h2>
                     </td>
@@ -57,20 +57,22 @@
             </tr>
         </table>
 
-        <th:blcok th:if="${#lists.isEmpty(leagueEntry)}">
+        <th:blcok th:if="${leagueEntry.tier == null}">
             <h2>Unranked</h2>
         </th:blcok>
 
-        <div id="match-table" th:onclick="callPastMatch([[${result.name}]], 0)"></div>
+        <table align="center">
+            <tbody id="match-table"></tbody>
+        </table>
 
         <div id="loading"><img src="https://blog.kakaocdn.net/dn/bVlxDK/btq6lZaZ9u5/tt3SQWLkf692DbCsQMJS0k/img.gif"></div>
 
         <br>
 
-        <button type="button" id="resultButton" th:onclick="callPastMatch([[${result.name}]])">더 보기</button>
+        <button type="button" id="resultButton" th:onclick="callPastMatch([[${summoner.name}]])">더 보기</button>
     </th:block>
 
-    <th:block th:if="${result == null}">
+    <th:block th:if="${summoner == null}">
         <h2>
             잘못된 소환사 이름입니다. 다시 입력하세요.
         </h2>
@@ -78,12 +80,32 @@
 
 </div>
 
-<script>
+<script th:inline="javascript">
     let start = 0;
 
-    window.onload = function () {
+    /*<![CDATA[*/
+    $(function (){
         $('#loading').hide();
-    }
+
+        if([[${summoner}]] != null) {
+            $.ajax({
+                beforeSend: function () {
+                    $('#loading').show();
+                    $('#resultButton').hide();
+                },
+                url: '/' + [[${summoner?.name}]] + '/' + start,
+                type: 'GET',
+                complete: function () {
+                    $('#loading').hide();
+                    $('#resultButton').show();
+                },
+            }).done(function (result) {
+                $('#match-table').append(result);
+                start = start + 5;
+            });
+        }
+    })
+    /*]]*/
 
     function callPastMatch(summonerName) {
         $.ajax({
@@ -98,7 +120,7 @@
                 $('#resultButton').show();
             },
         }).done(function (result) {
-            $('#match-table').replaceWith(result);
+            $('#match-table').append(result);
             start = start + 5;
         });
     }
