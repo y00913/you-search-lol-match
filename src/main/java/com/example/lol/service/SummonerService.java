@@ -109,15 +109,26 @@ public class SummonerService {
 
                 JSONParser jsonParser = new JSONParser();
                 JSONArray jsonArray = (JSONArray) jsonParser.parse(body);
-                if (jsonArray.size() != 0) {
-                    JSONObject jsonObject = (JSONObject) jsonArray.get(0);
 
-                    leagueEntryDTO.setTier(jsonObject.get("tier").toString());
-                    leagueEntryDTO.setTierUrl(iconService.callTierIcon(jsonObject.get("tier").toString()));
-                    leagueEntryDTO.setRank(jsonObject.get("rank").toString());
-                    leagueEntryDTO.setLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
-                    leagueEntryDTO.setWins(Integer.parseInt(jsonObject.get("wins").toString()));
-                    leagueEntryDTO.setLosses(Integer.parseInt(jsonObject.get("losses").toString()));
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+
+                    QueueTypeDTO queueTypeDTO = new QueueTypeDTO();
+
+                    queueTypeDTO.setQueueType(jsonObject.get("queueType").toString());
+                    queueTypeDTO.setTier(jsonObject.get("tier").toString());
+                    queueTypeDTO.setTierUrl(iconService.callTierIcon(jsonObject.get("tier").toString()));
+                    queueTypeDTO.setRank(jsonObject.get("rank").toString());
+                    queueTypeDTO.setLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
+                    queueTypeDTO.setWins(Integer.parseInt(jsonObject.get("wins").toString()));
+                    queueTypeDTO.setLosses(Integer.parseInt(jsonObject.get("losses").toString()));
+
+
+                    if (queueTypeDTO.getQueueType().equals("RANKED_FLEX_SR")) {
+                        leagueEntryDTO.setRanked_Flex(queueTypeDTO);
+                    } else {
+                        leagueEntryDTO.setRanked_Solo(queueTypeDTO);
+                    }
                 }
             }
 

@@ -8,10 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LeagueEntryDTO {
-    private String tier;
-    private String tierUrl;
-    private String rank;
-    private int leaguePoints;
-    private int wins;
-    private int losses;
+    private QueueTypeDTO Ranked_Flex;
+    private QueueTypeDTO Ranked_Solo;
 }
