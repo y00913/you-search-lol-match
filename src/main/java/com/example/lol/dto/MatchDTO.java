@@ -11,10 +11,10 @@ import java.util.List;
 @AllArgsConstructor
 public class MatchDTO {
     private String matchId;
+    private String queueType;
     private List<MatchUserInfoDTO> matchUserInfoDTOs;
     private Long gameDurationMinutes;
     private Long gameDurationSeconds;
-    private String gameMode;
     private boolean win;
     private String endTime;
     private MyInfoDTO myInfoDTO;

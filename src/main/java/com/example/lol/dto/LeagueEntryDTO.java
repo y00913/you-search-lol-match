@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LeagueEntryDTO {
-    private QueueTypeDTO Ranked_Flex;
-    private QueueTypeDTO Ranked_Solo;
+    private RankTypeDTO Ranked_Flex;
+    private RankTypeDTO Ranked_Solo;
 }

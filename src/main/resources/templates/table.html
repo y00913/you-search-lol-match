@@ -5,19 +5,24 @@
 </head>
 <body>
 
+<style>
+    .td_style {
+        text-align: center;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        /*border: solid black 1px;*/
+        border-radius: 30px;
+    }
+</style>
+
 <th:block th:if="${result != null}">
     <div>
         <th:block th:if="${!#lists.isEmpty(matches)}">
             <table align="center">
                 <tr th:each="match: ${matches}">
-                    <td style="text-align: center; padding: 30px 0 30px 0">
+                    <td class="td_style">
                         <h3>
-                            <span th:if="${match.gameMode == 'ARAM'}">무작위 총력전 </span>
-                            <span th:if="${match.gameMode == 'CLASSIC'}"> 소환사 협곡 </span>
-                            <span th:if="${match.gameMode == 'URF'}"> 우르프 </span>
-                            <span th:if="${match.gameMode == 'KINGPORO'}"> 포로왕의 전설 </span>
-                            <span th:if="${match.gameMode == 'SIEGE'}"> 돌격 넥서스 </span>
-                            <span th:if="${match.gameMode == 'ONEFORALL'}"> 단일 챔피언 </span>
+                            <span th:text="${match.queueType}"></span>
                             <span th:text="${match.endTime}"></span>
                             <p>
                                 <span th:if="${match.win == true}" style="color: blue">
@@ -72,17 +77,27 @@
                             </tr>
                         </table>
 
-                        <button type="button" th:id="'call' + ${match.matchId}"
-                                th:onclick="callDetailMatch([[${match.matchId}]])">상세보기
-                        </button>
 
-                        <div th:id="'loading' + ${match.matchId}" style="display: none">
+                        <div th:id="'loading' + ${match.matchId}" style="display: none; margin-top: 30px">
                             <img src="https://blog.kakaocdn.net/dn/bVlxDK/btq6lZaZ9u5/tt3SQWLkf692DbCsQMJS0k/img.gif">
                         </div>
 
-                        <button type="button" style="display:none;" th:id="'showDetail' + ${match.matchId}"
-                                th:onclick="showDetail([[${match.matchId}]])">숨기기
-                        </button>
+                        <div style=" cursor:pointer; border: none; margin-top: 10px; margin-bottom: 10px">
+                            <button type="button" th:id="'call' + ${match.matchId}"
+                                    th:onclick="callDetailMatch([[${match.matchId}]])"
+                                    style="background-color: rgba(0,0,0,0); cursor:pointer; border: none">
+                                <img src="https://e7.pngegg.com/pngimages/184/620/png-clipart-arrow-down-about-line-finger-line-computer-icons-arrow-hand-about-line.png"
+                                     style="max-width: 50px; max-height: 50px" alt="상세보기">
+                            </button>
+                            <button type="button"
+                                    style="display:none;cursor:pointer; border: none"
+                                    th:id="'showDetail' + ${match.matchId}"
+                                    th:onclick="showDetail([[${match.matchId}]])">
+                                <img src="https://w7.pngwing.com/pngs/433/937/png-transparent-up-arrow-android-computer-icons-up-arrow-angle-logo-number.png"
+                                     style="max-width: 50px; max-height: 50px" th:id="'showButton' + ${match.matchId}"
+                                     alt="숨기기">
+                            </button>
+                        </div>
 
                         <div th:id="showD + ${match.matchId}">
                             <div th:id="'detail' + ${match.matchId}" align="center"></div>
@@ -117,10 +132,10 @@
     function showDetail(matchId) {
         if ($('#showD' + matchId).is(":visible")) {
             $('#showD' + matchId).hide();
-            $('#showDetail' + matchId).text('상세보기');
+            $('#showButton' + matchId).attr("src", "https://e7.pngegg.com/pngimages/184/620/png-clipart-arrow-down-about-line-finger-line-computer-icons-arrow-hand-about-line.png");
         } else {
             $('#showD' + matchId).show();
-            $('#showDetail' + matchId).text('숨기기');
+            $('#showButton' + matchId).attr("src", "https://w7.pngwing.com/pngs/433/937/png-transparent-up-arrow-android-computer-icons-up-arrow-angle-logo-number.png");
         }
     }
 </script>

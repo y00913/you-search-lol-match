@@ -1,9 +1,7 @@
 package com.example.lol.service;
 
 import com.example.lol.dto.*;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -19,15 +17,11 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @PropertySource(value = "classpath:riotApiKey.properties")
 public class SummonerService {
-
     private ObjectMapper objectMapper = new ObjectMapper();
     private IconService iconService = new IconService();
 
@@ -113,7 +107,7 @@ public class SummonerService {
                 for (int i = 0; i < jsonArray.size(); i++) {
                     JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 
-                    QueueTypeDTO queueTypeDTO = new QueueTypeDTO();
+                    RankTypeDTO queueTypeDTO = new RankTypeDTO();
 
                     queueTypeDTO.setQueueType(jsonObject.get("queueType").toString());
                     queueTypeDTO.setTier(jsonObject.get("tier").toString());
@@ -163,21 +157,25 @@ public class SummonerService {
                     JSONObject info = (JSONObject) jsonObject.get("info");
                     JSONArray participants = (JSONArray) info.get("participants");
 
-                    matchDTO.setGameMode(info.get("gameMode").toString());
+                    matchDTO.setQueueType(findQueueType(info.get("queueId").toString()));
 
-                    long timestamp = (System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString())) / 1000 / 60 / 60;
-
-                    if (timestamp >= 24) {
-                        String endTime = Math.round(timestamp / 24) + "일 전";
+                    long timestamp = (System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString())) / 1000;
+                    if (timestamp < 60) {
+                        String endTime = Math.round(timestamp) + "초 전";
                         matchDTO.setEndTime(endTime);
-                    } else if (timestamp * 24 >= 60) {
-                        String endTime = Math.round(timestamp) + "시간 전";
+                    } else if (timestamp / 60 < 60) {
+                        String endTime = Math.round(timestamp / 60) + "분 전";
+                        matchDTO.setEndTime(endTime);
+                    } else if (timestamp / 60 / 60 < 24) {
+                        String endTime = Math.round(timestamp / 60 / 60) + "시간 전";
+                        matchDTO.setEndTime(endTime);
+                    } else if (timestamp / 60 / 60 / 24 < 30){
+                        String endTime = Math.round(timestamp / 60 / 60 / 24) + "일 전";
                         matchDTO.setEndTime(endTime);
                     } else {
-                        String endTime = Math.round(timestamp) + "분 전";
+                        String endTime = Math.round(timestamp / 60 / 60 / 24 / 30) + "달 전";
                         matchDTO.setEndTime(endTime);
                     }
-
 
                     Long gameDuration = Long.parseLong(info.get("gameDuration").toString());
                     matchDTO.setGameDurationMinutes(gameDuration / 60);
@@ -296,6 +294,40 @@ public class SummonerService {
         }
 
         return matchDTO;
+    }
+
+    public String findQueueType(String queueId) {
+        String result = "";
+
+        if(queueId.equals("400") || queueId.equals("430")){
+            result = "일반";
+        } else if(queueId.equals("420")){
+            result = "솔랭";
+        } else if(queueId.equals("440")){
+            result = "자유 랭크";
+        } else if(queueId.equals("450")){
+            result = "무작위 총력전";
+        } else if(queueId.equals("700")){
+            result = "격전";
+        } else if(queueId.equals("800") || queueId.equals("810") || queueId.equals("820") || queueId.equals("830") || queueId.equals("840") || queueId.equals("850")){
+            result = "AI 대전";
+        } else if(queueId.equals("900")){
+            result = "URF 모드";
+        } else if(queueId.equals("920")){
+            result = "전설의 포로왕";
+        } else if(queueId.equals("1020")){
+            result = "단일 챔피언";
+        } else if(queueId.equals("1300")){
+            result = "돌격! 넥서스";
+        } else if(queueId.equals("1400")){
+            result = "궁극기 주문서";
+        } else if(queueId.equals("2000") || queueId.equals("2010") || queueId.equals("2020")){
+            result = "튜토리얼";
+        } else {
+            result = "기타";
+        }
+
+        return result;
     }
 
 }

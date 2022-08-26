@@ -30,6 +30,8 @@ public class IndexController {
         String summonerNameRepl = summonerName.replaceAll(" ","%20");
         SummonerDTO summonerDTO = summonerService.callRiotAPISummonerByName(summonerNameRepl);
 
+        System.out.println(summonerName);
+
         if(summonerDTO.getName() != null) {
             model.addAttribute("summoner",summonerDTO);
             LeagueEntryDTO leagueEntry = summonerService.callLeagueEntry(summonerDTO.getId());
@@ -48,18 +50,12 @@ public class IndexController {
 
         if(summonerDTO != null) {
             List<String> matchHistory = summonerService.callMatchHistory(summonerDTO.getPuuid(), start  );
-
-            System.out.println(summonerDTO);
-            System.out.println(matchHistory);
-
             List<MatchDTO> matchDTOs = summonerService.callMatchAbout(matchHistory,summonerName);
 
             model.addAttribute("matches",matchDTOs);
-
-            System.out.println(matchDTOs.get(0).toString());
         }
 
-        return "table";
+        return "table :: body";
     }
 
     @GetMapping("/detail/{matchId}")
@@ -68,9 +64,7 @@ public class IndexController {
 
         model.addAttribute("match",matchDTO);
 
-        System.out.println(matchId);
-
-        return "detail-table";
+        return "detail-table :: body";
     }
 
 }

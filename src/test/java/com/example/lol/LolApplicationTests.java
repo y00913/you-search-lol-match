@@ -8,6 +8,11 @@ class LolApplicationTests {
 
     @Test
     void contextLoads() {
+        long timestamp = (System.currentTimeMillis() - Long.parseLong("1661521220421")) / 1000;
+
+        System.out.println(timestamp / 60 + " 분 ");
+        System.out.println(timestamp / 60 / 60 + " 시 ");
+        System.out.println(timestamp / 60 / 60 / 24 + " 일 ");
     }
 
 }

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class QueueTypeDTO {
+public class RankTypeDTO {
     private String queueType;
     private String tier;
     private String tierUrl;
