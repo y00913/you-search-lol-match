@@ -30,13 +30,13 @@ public class IndexController {
         String summonerNameRepl = summonerName.replaceAll(" ","%20");
         SummonerDTO summonerDTO = summonerService.callRiotAPISummonerByName(summonerNameRepl);
 
-        System.out.println(summonerName);
-
         if(summonerDTO.getName() != null) {
             model.addAttribute("summoner",summonerDTO);
             LeagueEntryDTO leagueEntry = summonerService.callLeagueEntry(summonerDTO.getId());
             model.addAttribute("leagueEntry", leagueEntry);
         }
+
+        System.out.println(summonerDTO.getName() + "   puuid : " + summonerDTO.getPuuid() + "   id : " + summonerDTO.getId());
 
         return "result";
     }

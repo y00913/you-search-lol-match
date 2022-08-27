@@ -66,7 +66,7 @@ public class SummonerService {
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url + puuid + "/ids?start=" + start + "&count=5&api_key=" + myKey);
+            HttpGet request = new HttpGet(url + puuid + "/ids?start=" + start + "&count=7&api_key=" + myKey);
             HttpResponse response = client.execute(request);
 
             if (response.getStatusLine().getStatusCode() == 200) {
@@ -157,7 +157,11 @@ public class SummonerService {
                     JSONObject info = (JSONObject) jsonObject.get("info");
                     JSONArray participants = (JSONArray) info.get("participants");
 
-                    matchDTO.setQueueType(findQueueType(info.get("queueId").toString()));
+                    String qt = findQueueType(info.get("queueId").toString());
+                    if(qt.equals("기타")){
+                        continue;
+                    }
+                    matchDTO.setQueueType(qt);
 
                     long timestamp = (System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString())) / 1000;
                     if (timestamp < 60) {
@@ -321,8 +325,6 @@ public class SummonerService {
             result = "돌격! 넥서스";
         } else if(queueId.equals("1400")){
             result = "궁극기 주문서";
-        } else if(queueId.equals("2000") || queueId.equals("2010") || queueId.equals("2020")){
-            result = "튜토리얼";
         } else {
             result = "기타";
         }

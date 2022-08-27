@@ -14,15 +14,15 @@
 <article>
     <div align="center">
         <th:block th:if="${summoner != null}">
-            <div style="border: solid #F1F1F1 1px; max-width: 1000px; max-height: 300px; border-radius: 30px; margin-bottom: 50px; background-color: #F1F1F1">
+            <div style="border: solid #F1F1F1 1px; max-width: 1100px; max-height: 300px; border-radius: 30px; margin-bottom: 50px; background-color: #F1F1F1">
                 <table style="text-align: center">
                     <tr>
                         <table>
                             <tr align="center" style="padding: 1em">
-                                <td>
+                                <td style="width: 100px">
                                     <img th:src="${summoner.profileIcon}" width="100" style="border-radius: 30px">
                                 </td>
-                                <td>
+                                <td style="width: 160px">
                                     <h2>
                                         <p>
                                             <span th:text="${summoner.name}"></span>
@@ -33,14 +33,14 @@
                                     </h2>
                                 </td>
 
-                                <td style="padding-left: 150px">
+                                <td style="padding-left: 150px; width: 100px">
                                     <th:block th:if="${leagueEntry.Ranked_Solo != null}">
                                         <p><img th:src="${leagueEntry.Ranked_Solo.tierUrl}" width="100"
                                                 style="border-radius: 30px"></p>
                                     </th:block>
                                 </td>
 
-                                <td style="border-collapse: collapse; border-spacing: 1px 1px">
+                                <td style="border-collapse: collapse; border-spacing: 1px 1px; width: 180px">
                                     <div style="margin-bottom: 0; font-weight: bold">
                                         <span>솔로 랭크</span>
                                     </div>
@@ -66,14 +66,14 @@
                                     </th:blcok>
                                 </td>
 
-                                <td style="padding-left: 50px">
+                                <td style="padding-left: 10px; width: 100px">
                                     <th:block th:if="${leagueEntry.Ranked_Flex != null}">
                                         <p><img th:src="${leagueEntry.Ranked_Flex.tierUrl}" width="100"
                                                 style="border-radius: 30px"></p>
                                     </th:block>
                                 </td>
 
-                                <td style="border-collapse: collapse; border-spacing: 1px 1px">
+                                <td style="border-collapse: collapse; border-spacing: 1px 1px; width: 180px">
                                     <div style="margin-bottom: 0; font-weight: bold">
                                         <span>자유 랭크</span>
                                     </div>

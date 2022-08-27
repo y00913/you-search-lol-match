@@ -8,10 +8,21 @@
 <style>
     .td_style {
         text-align: center;
-        padding-top: 30px;
-        padding-bottom: 30px;
-        /*border: solid black 1px;*/
-        border-radius: 30px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        border-radius: 15px;
+        width: 700px;
+    }
+
+    .show {
+        cursor: pointer;
+        border: none;
+    }
+
+    .hide {
+        display: none;
+        cursor: pointer;
+        border: none;
     }
 </style>
 
@@ -20,24 +31,33 @@
         <th:block th:if="${!#lists.isEmpty(matches)}">
             <table align="center">
                 <tr th:each="match: ${matches}">
-                    <td class="td_style">
-                        <h3>
-                            <span th:text="${match.queueType}"></span>
-                            <span th:text="${match.endTime}"></span>
-                            <p>
-                                <span th:if="${match.win == true}" style="color: blue">
-                                    승리
-                                </span>
-                                <span th:if="${match.win == false}" style="color: red">
-                                    패배
-                                </span>
-                                <span th:text="${match.gameDurationMinutes}"></span>분
-                                <span th:text="${match.gameDurationSeconds}"></span>초
-                            </p>
-                        </h3>
+                    <td class="td_style"
+                        th:style="${match.win == true} ? 'background-color: #B4EAF2' : 'background-color: #F2D2D1'">
 
                         <table style="margin-left: auto; margin-right: auto">
                             <tr>
+                                <td>
+                                    <div style="font-weight: bold; font-size: 1.2em; margin-right: 20px">
+                                        <div>
+                                            <span th:text="${match.queueType}"></span>
+                                        </div>
+                                        <div>
+                                            <span th:text="${match.endTime}"></span>
+                                        </div>
+                                        <div>
+                                            <span th:if="${match.win == true}" style="color: blue">
+                                                승리
+                                            </span>
+                                            <span th:if="${match.win == false}" style="color: red">
+                                                패배
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span th:text="${match.gameDurationMinutes}"></span>분
+                                            <span th:text="${match.gameDurationSeconds}"></span>초
+                                        </div>
+                                    </div>
+                                </td>
                                 <td>
                                     <img th:src="${match.myInfoDTO.championName}" width="100"
                                          style="border-radius: 70px">
@@ -60,12 +80,10 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div style="vertical-align: top">
-                                        <h2>
+                                    <div style="vertical-align: top; font-weight: bold; font-size: 1.2em;">
                                             <span th:text="${match.myInfoDTO.kills}"></span> /
                                             <span th:text="${match.myInfoDTO.deaths}"></span> /
                                             <span th:text="${match.myInfoDTO.assists}"></span>
-                                        </h2>
                                     </div>
 
                                     <div style="vertical-align: bottom">
@@ -74,33 +92,35 @@
                                         </th:block>
                                     </div>
                                 </td>
+                                <td>
+                                    <div th:id="'loading' + ${match.matchId}"
+                                         style="display: none; margin-left: 28px;">
+                                        <img src="https://blog.kakaocdn.net/dn/bVlxDK/btq6lZaZ9u5/tt3SQWLkf692DbCsQMJS0k/img.gif">
+                                    </div>
+
+                                    <div style="cursor:pointer; border: none; margin-left: 30px;">
+                                        <button type="button" class="show" th:id="'call' + ${match.matchId}"
+                                                th:onclick="callDetailMatch([[${match.matchId}]])"
+                                                th:style="${match.win == true} ? 'background-color: #B4EAF2' : 'background-color: #F2D2D1'">
+                                            <img src="https://cdn.icon-icons.com/icons2/1339/PNG/512/downarrow_87468.png"
+                                                 style="width: 40px; height: 40px; border-radius: 70px; filter: opacity(.5) drop-shadow(0 0 0 0)"
+                                                 alt="상세보기">
+                                        </button>
+                                        <button type="button" class="hide" th:id="'showDetail' + ${match.matchId}"
+                                                th:onclick="showDetail([[${match.matchId}]])"
+                                                th:style="${match.win == true} ? 'background-color: #B4EAF2' : 'background-color: #F2D2D1'">
+                                            <img src="https://cdn.icon-icons.com/icons2/1339/PNG/512/directionalarrow_87507.png"
+                                                 th:id="'showButton' + ${match.matchId}"
+                                                 style="width: 40px; height: 40px; border-radius: 70px; filter: opacity(.5) drop-shadow(0 0 0 0)"
+                                                 alt="숨기기">
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         </table>
 
-
-                        <div th:id="'loading' + ${match.matchId}" style="display: none; margin-top: 30px">
-                            <img src="https://blog.kakaocdn.net/dn/bVlxDK/btq6lZaZ9u5/tt3SQWLkf692DbCsQMJS0k/img.gif">
-                        </div>
-
-                        <div style=" cursor:pointer; border: none; margin-top: 10px; margin-bottom: 10px">
-                            <button type="button" th:id="'call' + ${match.matchId}"
-                                    th:onclick="callDetailMatch([[${match.matchId}]])"
-                                    style="background-color: rgba(0,0,0,0); cursor:pointer; border: none">
-                                <img src="https://e7.pngegg.com/pngimages/184/620/png-clipart-arrow-down-about-line-finger-line-computer-icons-arrow-hand-about-line.png"
-                                     style="max-width: 50px; max-height: 50px" alt="상세보기">
-                            </button>
-                            <button type="button"
-                                    style="display:none;cursor:pointer; border: none"
-                                    th:id="'showDetail' + ${match.matchId}"
-                                    th:onclick="showDetail([[${match.matchId}]])">
-                                <img src="https://w7.pngwing.com/pngs/433/937/png-transparent-up-arrow-android-computer-icons-up-arrow-angle-logo-number.png"
-                                     style="max-width: 50px; max-height: 50px" th:id="'showButton' + ${match.matchId}"
-                                     alt="숨기기">
-                            </button>
-                        </div>
-
-                        <div th:id="showD + ${match.matchId}">
-                            <div th:id="'detail' + ${match.matchId}" align="center"></div>
+                        <div th:id="showD + ${match.matchId}" align="center">
+                            <div th:id="'detail' + ${match.matchId}"></div>
                         </div>
                     </td>
                 </tr>
@@ -132,10 +152,10 @@
     function showDetail(matchId) {
         if ($('#showD' + matchId).is(":visible")) {
             $('#showD' + matchId).hide();
-            $('#showButton' + matchId).attr("src", "https://e7.pngegg.com/pngimages/184/620/png-clipart-arrow-down-about-line-finger-line-computer-icons-arrow-hand-about-line.png");
+            $('#showButton' + matchId).attr("src", "https://cdn.icon-icons.com/icons2/1339/PNG/512/downarrow_87468.png");
         } else {
             $('#showD' + matchId).show();
-            $('#showButton' + matchId).attr("src", "https://w7.pngwing.com/pngs/433/937/png-transparent-up-arrow-android-computer-icons-up-arrow-angle-logo-number.png");
+            $('#showButton' + matchId).attr("src", "https://cdn.icon-icons.com/icons2/1339/PNG/512/directionalarrow_87507.png");
         }
     }
 </script>
