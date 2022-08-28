@@ -50,7 +50,7 @@ public class IndexController {
 
         if(summonerDTO != null) {
             List<String> matchHistory = summonerService.callMatchHistory(summonerDTO.getPuuid(), start  );
-            List<MatchDTO> matchDTOs = summonerService.callMatchAbout(matchHistory,summonerName);
+            List<MatchDTO> matchDTOs = summonerService.callMatchAbout(matchHistory,summonerDTO.getPuuid());
 
             model.addAttribute("matches",matchDTOs);
         }

@@ -8,8 +8,7 @@
 <style>
     .td_style {
         text-align: center;
-        padding-top: 20px;
-        padding-bottom: 20px;
+        padding: 20px 20px 20px 20px;
         border-radius: 15px;
         width: 700px;
     }
@@ -36,7 +35,7 @@
 
                         <table style="margin-left: auto; margin-right: auto">
                             <tr>
-                                <td>
+                                <td style="width: 170px;">
                                     <div style="font-weight: bold; font-size: 1.2em; margin-right: 20px">
                                         <div>
                                             <span th:text="${match.queueType}"></span>
@@ -58,11 +57,11 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
+                                <td style="width: 105px;">
                                     <img th:src="${match.myInfoDTO.championName}" width="100"
-                                         style="border-radius: 70px">
+                                         style="border-radius: 70px;">
                                 </td>
-                                <td>
+                                <td style="width: 40px;">
                                     <div style="vertical-align: top">
                                         <img th:src="${match.myInfoDTO.spell1Id}" width="40">
                                     </div>
@@ -70,8 +69,8 @@
                                         <img th:src="${match.myInfoDTO.spell2Id}" width="40">
                                     </div>
                                 </td>
-                                <td>
-                                    <div style="vertical-align: top">
+                                <td style="width: 40px;">
+                                    <div style="vertical-align: top;">
                                         <img th:src="${match.myInfoDTO.primaryPerk}" width="40"
                                              style="background-color: black; border-radius: 70px">
                                     </div>
@@ -79,20 +78,20 @@
                                         <img th:src="${match.myInfoDTO.subPerk}" width="40">
                                     </div>
                                 </td>
-                                <td>
-                                    <div style="vertical-align: top; font-weight: bold; font-size: 1.2em;">
-                                            <span th:text="${match.myInfoDTO.kills}"></span> /
-                                            <span th:text="${match.myInfoDTO.deaths}"></span> /
-                                            <span th:text="${match.myInfoDTO.assists}"></span>
+                                <td style="width: 290px;">
+                                    <div style="vertical-align: top; font-weight: bold; font-size: 1.5em; margin-bottom: 15px;">
+                                        <span th:text="${match.myInfoDTO.kills}"></span> /
+                                        <span th:text="${match.myInfoDTO.deaths}"></span> /
+                                        <span th:text="${match.myInfoDTO.assists}"></span>
                                     </div>
 
-                                    <div style="vertical-align: bottom">
+                                    <div style="vertical-align: bottom; margin-left: 10px">
                                         <th:block th:each="item : ${match.myInfoDTO.items}">
                                             <img th:src="${item}" width="30">
                                         </th:block>
                                     </div>
                                 </td>
-                                <td>
+                                <td style="width: 75px;">
                                     <div th:id="'loading' + ${match.matchId}"
                                          style="display: none; margin-left: 28px;">
                                         <img src="https://blog.kakaocdn.net/dn/bVlxDK/btq6lZaZ9u5/tt3SQWLkf692DbCsQMJS0k/img.gif">
@@ -103,7 +102,7 @@
                                                 th:onclick="callDetailMatch([[${match.matchId}]])"
                                                 th:style="${match.win == true} ? 'background-color: #B4EAF2' : 'background-color: #F2D2D1'">
                                             <img src="https://cdn.icon-icons.com/icons2/1339/PNG/512/downarrow_87468.png"
-                                                 style="width: 40px; height: 40px; border-radius: 70px; filter: opacity(.5) drop-shadow(0 0 0 0)"
+                                                 style="max-width: 40px; max-height: 40px; border-radius: 70px; filter: opacity(.5) drop-shadow(0 0 0 0)"
                                                  alt="상세보기">
                                         </button>
                                         <button type="button" class="hide" th:id="'showDetail' + ${match.matchId}"
@@ -111,7 +110,7 @@
                                                 th:style="${match.win == true} ? 'background-color: #B4EAF2' : 'background-color: #F2D2D1'">
                                             <img src="https://cdn.icon-icons.com/icons2/1339/PNG/512/directionalarrow_87507.png"
                                                  th:id="'showButton' + ${match.matchId}"
-                                                 style="width: 40px; height: 40px; border-radius: 70px; filter: opacity(.5) drop-shadow(0 0 0 0)"
+                                                 style="max-width: 40px; max-height: 40px; border-radius: 70px; filter: opacity(.5) drop-shadow(0 0 0 0)"
                                                  alt="숨기기">
                                         </button>
                                     </div>

@@ -134,7 +134,7 @@ public class SummonerService {
         return leagueEntryDTO;
     }
 
-    public List<MatchDTO> callMatchAbout(List<String> matchHistory, String summonerName) {
+    public List<MatchDTO> callMatchAbout(List<String> matchHistory, String puuid) {
         List<MatchDTO> matchDTOs = new ArrayList<>();
 
         for (String matchId : matchHistory) {
@@ -189,7 +189,7 @@ public class SummonerService {
                     for (int i = 0; i < participants.size(); i++) {
                         JSONObject participant = (JSONObject) participants.get(i);
 
-                        if (participant.get("summonerName").toString().equalsIgnoreCase(summonerName)) {
+                        if (participant.get("puuid").toString().equalsIgnoreCase(puuid)) {
                             matchDTO.setWin((boolean) participant.get("win"));
                             myInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
 
