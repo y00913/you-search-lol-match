@@ -16,12 +16,16 @@
     .show {
         cursor: pointer;
         border: none;
+        width: 21px;
+        height: 21px;
     }
 
     .hide {
         display: none;
         cursor: pointer;
         border: none;
+        width: 21px;
+        height: 21px;
     }
 </style>
 
@@ -91,13 +95,13 @@
                                         </th:block>
                                     </div>
                                 </td>
-                                <td style="width: 75px;">
+                                <td style="width: 75px; text-align: right;">
                                     <div th:id="'loading' + ${match.matchId}"
-                                         style="display: none; margin-left: 8px;">
+                                         style="display: none;">
                                         <img src="https://blog.kakaocdn.net/dn/bVlxDK/btq6lZaZ9u5/tt3SQWLkf692DbCsQMJS0k/img.gif">
                                     </div>
 
-                                    <div style="cursor:pointer; border: none; margin-left: 30px;">
+                                    <div style="cursor:pointer; border: none; margin-left: 35px;">
                                         <button type="button" class="show" th:id="'call' + ${match.matchId}"
                                                 th:onclick="callDetailMatch([[${match.matchId}]])"
                                                 th:style="${match.win == true} ? 'background-color: #B4EAF2' : 'background-color: #F2D2D1'">
