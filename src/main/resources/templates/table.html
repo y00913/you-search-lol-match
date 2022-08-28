@@ -91,18 +91,18 @@
                                         </th:block>
                                     </div>
                                 </td>
-                                <td style="width: 75px;">
+                                <td style="width: 75px; margin-left: 30px;">
                                     <div th:id="'loading' + ${match.matchId}"
-                                         style="display: none; margin-left: 8px;">
+                                         style="display: none; width: 15px; height: 15px;">
                                         <img src="https://blog.kakaocdn.net/dn/bVlxDK/btq6lZaZ9u5/tt3SQWLkf692DbCsQMJS0k/img.gif">
                                     </div>
 
-                                    <div style="cursor:pointer; border: none; margin-left: 30px;">
+                                    <div style="cursor:pointer; border: none;">
                                         <button type="button" class="show" th:id="'call' + ${match.matchId}"
                                                 th:onclick="callDetailMatch([[${match.matchId}]])"
                                                 th:style="${match.win == true} ? 'background-color: #B4EAF2' : 'background-color: #F2D2D1'">
                                             <img src="https://cdn.icon-icons.com/icons2/1339/PNG/512/downarrow_87468.png"
-                                                 style="width: 20px; height: 20px; filter: opacity(.5) drop-shadow(0 0 0 0)"
+                                                 style="width: 15px; height: 15px; filter: opacity(.5) drop-shadow(0 0 0 0)"
                                                  alt="상세보기">
                                         </button>
                                         <button type="button" class="hide" th:id="'showDetail' + ${match.matchId}"
@@ -110,7 +110,7 @@
                                                 th:style="${match.win == true} ? 'background-color: #B4EAF2' : 'background-color: #F2D2D1'">
                                             <img src="https://cdn.icon-icons.com/icons2/1339/PNG/512/directionalarrow_87507.png"
                                                  th:id="'showButton' + ${match.matchId}"
-                                                 style="width: 20px; height: 20px; filter: opacity(.5) drop-shadow(0 0 0 0)"
+                                                 style="width: 15px; height: 15px; filter: opacity(.5) drop-shadow(0 0 0 0)"
                                                  alt="숨기기">
                                         </button>
                                     </div>
