@@ -106,7 +106,7 @@
                                                 th:onclick="callDetailMatch([[${match.matchId}]])"
                                                 th:style="${match.win == true} ? 'background-color: #B4EAF2' : 'background-color: #F2D2D1'">
                                             <img src="https://cdn.icon-icons.com/icons2/1339/PNG/512/downarrow_87468.png"
-                                                 style="width: 20px; height: 20px; filter: opacity(.5) drop-shadow(0 0 0 0)"
+                                                 style="width: 20px; height: 20px; filter: opacity(.5)"
                                                  alt="상세보기">
                                         </button>
                                         <button type="button" class="hide" th:id="'showDetail' + ${match.matchId}"
@@ -114,7 +114,7 @@
                                                 th:style="${match.win == true} ? 'background-color: #B4EAF2' : 'background-color: #F2D2D1'">
                                             <img src="https://cdn.icon-icons.com/icons2/1339/PNG/512/directionalarrow_87507.png"
                                                  th:id="'showButton' + ${match.matchId}"
-                                                 style="width: 20px; height: 20px; filter: opacity(.5) drop-shadow(0 0 0 0)"
+                                                 style="width: 20px; height: 20px; filter: opacity(.5)"
                                                  alt="숨기기">
                                         </button>
                                     </div>
