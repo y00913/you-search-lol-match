@@ -105,14 +105,14 @@
                                         <button type="button" class="show" th:id="'call' + ${match.matchId}"
                                                 th:onclick="callDetailMatch([[${match.matchId}]])"
                                                 th:style="${match.win == true} ? 'background-color: #B4EAF2' : 'background-color: #F2D2D1'">
-                                            <img src="https://cdn.icon-icons.com/icons2/1339/PNG/512/downarrow_87468.png"
+                                            <img src="http://cdn.icon-icons.com/icons2/1339/PNG/512/downarrow_87468.png"
                                                  style="width: 20px; height: 20px; filter: opacity(.5)"
                                                  alt="상세보기">
                                         </button>
                                         <button type="button" class="hide" th:id="'showDetail' + ${match.matchId}"
                                                 th:onclick="showDetail([[${match.matchId}]])"
                                                 th:style="${match.win == true} ? 'background-color: #B4EAF2' : 'background-color: #F2D2D1'">
-                                            <img src="https://cdn.icon-icons.com/icons2/1339/PNG/512/directionalarrow_87507.png"
+                                            <img src="http://cdn.icon-icons.com/icons2/1339/PNG/512/directionalarrow_87507.png"
                                                  th:id="'showButton' + ${match.matchId}"
                                                  style="width: 20px; height: 20px; filter: opacity(.5)"
                                                  alt="숨기기">
@@ -155,10 +155,10 @@
     function showDetail(matchId) {
         if ($('#showD' + matchId).is(":visible")) {
             $('#showD' + matchId).hide();
-            $('#showButton' + matchId).attr("src", "https://cdn.icon-icons.com/icons2/1339/PNG/512/downarrow_87468.png");
+            $('#showButton' + matchId).attr("src", "http://cdn.icon-icons.com/icons2/1339/PNG/512/downarrow_87468.png");
         } else {
             $('#showD' + matchId).show();
-            $('#showButton' + matchId).attr("src", "https://cdn.icon-icons.com/icons2/1339/PNG/512/directionalarrow_87507.png");
+            $('#showButton' + matchId).attr("src", "http://cdn.icon-icons.com/icons2/1339/PNG/512/directionalarrow_87507.png");
         }
     }
 </script>
