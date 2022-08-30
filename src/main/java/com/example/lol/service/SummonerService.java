@@ -15,9 +15,11 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @PropertySource(value = "classpath:riotApiKey.properties")
@@ -66,7 +68,7 @@ public class SummonerService {
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url + puuid + "/ids?start=" + start + "&count=7&api_key=" + myKey);
+            HttpGet request = new HttpGet(url + puuid + "/ids?start=" + start + "&count=10&api_key=" + myKey);
             HttpResponse response = client.execute(request);
 
             if (response.getStatusLine().getStatusCode() == 200) {
@@ -144,84 +146,83 @@ public class SummonerService {
             matchDTO.setMatchId(matchId);
 
             try {
-                HttpClient client = HttpClientBuilder.create().build();
-                HttpGet request = new HttpGet(url);
-                HttpResponse response = client.execute(request);
+                WebClient webClient = WebClient.builder().baseUrl(url).build();
+                List<String> body = webClient.get()
+                        .uri(uriBuilder -> uriBuilder.path("")
+                                .queryParam("api_key", myKey).build())
+                        .retrieve()
+                        .bodyToFlux(String.class)
+                        .toStream()
+                        .collect(Collectors.toList());
 
-                if (response.getStatusLine().getStatusCode() == 200) {
-                    ResponseHandler<String> handler = new BasicResponseHandler();
-                    String body = handler.handleResponse(response);
+                JSONParser jsonParser = new JSONParser();
+                JSONObject jsonObject = (JSONObject) jsonParser.parse(body.get(0));
+                JSONObject info = (JSONObject) jsonObject.get("info");
+                JSONArray participants = (JSONArray) info.get("participants");
 
-                    JSONParser jsonParser = new JSONParser();
-                    JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
-                    JSONObject info = (JSONObject) jsonObject.get("info");
-                    JSONArray participants = (JSONArray) info.get("participants");
-
-                    String qt = findQueueType(info.get("queueId").toString());
-                    if(qt.equals("기타")){
-                        continue;
-                    }
-                    matchDTO.setQueueType(qt);
-
-                    long timestamp = (System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString())) / 1000;
-                    if (timestamp < 60) {
-                        String endTime = Math.round(timestamp) + "초 전";
-                        matchDTO.setEndTime(endTime);
-                    } else if (timestamp / 60 < 60) {
-                        String endTime = Math.round(timestamp / 60) + "분 전";
-                        matchDTO.setEndTime(endTime);
-                    } else if (timestamp / 60 / 60 < 24) {
-                        String endTime = Math.round(timestamp / 60 / 60) + "시간 전";
-                        matchDTO.setEndTime(endTime);
-                    } else if (timestamp / 60 / 60 / 24 < 30){
-                        String endTime = Math.round(timestamp / 60 / 60 / 24) + "일 전";
-                        matchDTO.setEndTime(endTime);
-                    } else {
-                        String endTime = Math.round(timestamp / 60 / 60 / 24 / 30) + "달 전";
-                        matchDTO.setEndTime(endTime);
-                    }
-
-                    Long gameDuration = Long.parseLong(info.get("gameDuration").toString());
-                    matchDTO.setGameDurationMinutes(gameDuration / 60);
-                    matchDTO.setGameDurationSeconds(gameDuration % 60);
-
-                    MyInfoDTO myInfoDTO = new MyInfoDTO();
-                    for (int i = 0; i < participants.size(); i++) {
-                        JSONObject participant = (JSONObject) participants.get(i);
-
-                        if (participant.get("puuid").toString().equalsIgnoreCase(puuid)) {
-                            matchDTO.setWin((boolean) participant.get("win"));
-                            myInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
-
-                            List<String> myItems = new ArrayList<>();
-                            for (int j = 0; j <= 6; j++) {
-                                myItems.add(iconService.callItemIcon(participant.get("item" + j).toString()));
-                            }
-                            myInfoDTO.setItems(myItems);
-
-                            myInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
-                            myInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
-                            myInfoDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
-                            myInfoDTO.setSpell1Id(iconService.callSpellIcon(participant.get("summoner1Id").toString()));
-                            myInfoDTO.setSpell2Id(iconService.callSpellIcon(participant.get("summoner2Id").toString()));
-
-                            JSONObject perks = (JSONObject) participant.get("perks");
-                            JSONArray styles = (JSONArray) perks.get("styles");
-                            JSONObject primaryStyle = (JSONObject) styles.get(0);
-                            JSONObject subStyle = (JSONObject) styles.get(1);
-                            JSONArray primarySelections = (JSONArray) primaryStyle.get("selections");
-                            JSONObject primarySelectionsNumber = (JSONObject) primarySelections.get(0);
-
-                            myInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
-                            myInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
-                        }
-                    }
-
-                    matchDTO.setMyInfoDTO(myInfoDTO);
-                } else {
-                    System.out.println("error : " + response.getStatusLine().getStatusCode());
+                String qt = findQueueType(info.get("queueId").toString());
+                if (qt.equals("기타")) {
+                    continue;
                 }
-            } catch (ParseException | IOException e) {
+                matchDTO.setQueueType(qt);
+
+                long timestamp = (System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString())) / 1000;
+                if (timestamp < 60) {
+                    String endTime = Math.round(timestamp) + "초 전";
+                    matchDTO.setEndTime(endTime);
+                } else if (timestamp / 60 < 60) {
+                    String endTime = Math.round(timestamp / 60) + "분 전";
+                    matchDTO.setEndTime(endTime);
+                } else if (timestamp / 60 / 60 < 24) {
+                    String endTime = Math.round(timestamp / 60 / 60) + "시간 전";
+                    matchDTO.setEndTime(endTime);
+                } else if (timestamp / 60 / 60 / 24 < 30) {
+                    String endTime = Math.round(timestamp / 60 / 60 / 24) + "일 전";
+                    matchDTO.setEndTime(endTime);
+                } else {
+                    String endTime = Math.round(timestamp / 60 / 60 / 24 / 30) + "달 전";
+                    matchDTO.setEndTime(endTime);
+                }
+
+                Long gameDuration = Long.parseLong(info.get("gameDuration").toString());
+                matchDTO.setGameDurationMinutes(gameDuration / 60);
+                matchDTO.setGameDurationSeconds(gameDuration % 60);
+
+                MyInfoDTO myInfoDTO = new MyInfoDTO();
+                for (int i = 0; i < participants.size(); i++) {
+                    JSONObject participant = (JSONObject) participants.get(i);
+
+                    if (participant.get("puuid").toString().equalsIgnoreCase(puuid)) {
+                        matchDTO.setWin((boolean) participant.get("win"));
+                        myInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
+
+                        List<String> myItems = new ArrayList<>();
+                        for (int j = 0; j <= 6; j++) {
+                            myItems.add(iconService.callItemIcon(participant.get("item" + j).toString()));
+                        }
+                        myInfoDTO.setItems(myItems);
+
+                        myInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
+                        myInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
+                        myInfoDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
+                        myInfoDTO.setSpell1Id(iconService.callSpellIcon(participant.get("summoner1Id").toString()));
+                        myInfoDTO.setSpell2Id(iconService.callSpellIcon(participant.get("summoner2Id").toString()));
+
+                        JSONObject perks = (JSONObject) participant.get("perks");
+                        JSONArray styles = (JSONArray) perks.get("styles");
+                        JSONObject primaryStyle = (JSONObject) styles.get(0);
+                        JSONObject subStyle = (JSONObject) styles.get(1);
+                        JSONArray primarySelections = (JSONArray) primaryStyle.get("selections");
+                        JSONObject primarySelectionsNumber = (JSONObject) primarySelections.get(0);
+
+                        myInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
+                        myInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
+                    }
+                }
+
+                matchDTO.setMyInfoDTO(myInfoDTO);
+
+            } catch (ParseException e) {
                 e.printStackTrace();
                 return null;
             }
@@ -303,27 +304,27 @@ public class SummonerService {
     public String findQueueType(String queueId) {
         String result = "";
 
-        if(queueId.equals("400") || queueId.equals("430")){
+        if (queueId.equals("400") || queueId.equals("430")) {
             result = "일반";
-        } else if(queueId.equals("420")){
+        } else if (queueId.equals("420")) {
             result = "솔랭";
-        } else if(queueId.equals("440")){
+        } else if (queueId.equals("440")) {
             result = "자유 랭크";
-        } else if(queueId.equals("450")){
+        } else if (queueId.equals("450")) {
             result = "무작위 총력전";
-        } else if(queueId.equals("700")){
+        } else if (queueId.equals("700")) {
             result = "격전";
-        } else if(queueId.equals("800") || queueId.equals("810") || queueId.equals("820") || queueId.equals("830") || queueId.equals("840") || queueId.equals("850")){
+        } else if (queueId.equals("800") || queueId.equals("810") || queueId.equals("820") || queueId.equals("830") || queueId.equals("840") || queueId.equals("850")) {
             result = "AI 대전";
-        } else if(queueId.equals("900")){
+        } else if (queueId.equals("900")) {
             result = "URF 모드";
-        } else if(queueId.equals("920")){
+        } else if (queueId.equals("920")) {
             result = "전설의 포로왕";
-        } else if(queueId.equals("1020")){
+        } else if (queueId.equals("1020")) {
             result = "단일 챔피언";
-        } else if(queueId.equals("1300")){
+        } else if (queueId.equals("1300")) {
             result = "돌격! 넥서스";
-        } else if(queueId.equals("1400")){
+        } else if (queueId.equals("1400")) {
             result = "궁극기 주문서";
         } else {
             result = "기타";
