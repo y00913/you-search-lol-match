@@ -1,8 +1,6 @@
 package com.example.lol;
 
-import com.example.lol.dto.MatchDTO;
-import com.example.lol.dto.MyInfoDTO;
-import com.example.lol.dto.SummonerDTO;
+import com.example.lol.dto.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -18,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -82,7 +82,7 @@ class LolApplicationTests {
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url + puuid + "/ids?start=0&count=50&api_key=" + myKey);
+            HttpGet request = new HttpGet(url + puuid + "/ids?start=0&count=10&api_key=" + myKey);
             HttpResponse response = client.execute(request);
 
             if (response.getStatusLine().getStatusCode() == 200) {
@@ -106,24 +106,30 @@ class LolApplicationTests {
     }
 
     @Test
-    public void test() {
+    public List<String> test() throws ParseException {
         String puuid = "zohfVkLTI7DpNsI6-JU5GzsAUQACJTiN6XV8nCIKkJS42lyDUFU4gG-OdGtoHx1JxMopLmXXNXUSMQ";
         List<String> result = new ArrayList();
         String url = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/";
 
         WebClient webClient = WebClient.builder().baseUrl(url + puuid).build();
-        result = webClient.get()
+        List<String> body = webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/ids")
                         .queryParam("start", 0)
-                        .queryParam("count", 5)
+                        .queryParam("count", 10)
                         .queryParam("api_key", myKey).build())
                 .retrieve()
                 .bodyToFlux(String.class)
                 .toStream()
                 .collect(Collectors.toList());
 
-        System.out.println(result);
-//        return result;
+        JSONParser jsonParser = new JSONParser();
+        JSONArray jsonArray = (JSONArray) jsonParser.parse(body.get(0));
+
+        for (int i = 0; i < jsonArray.size(); i++) {
+            result.add(jsonArray.get(i).toString());
+        }
+
+        return result;
     }
 
     @Test
@@ -139,7 +145,7 @@ class LolApplicationTests {
                 .toStream()
                 .collect(Collectors.toList());
 
-        System.out.println(result.get(0));
+        System.out.println(result);
     }
 
     @Test
@@ -167,6 +173,8 @@ class LolApplicationTests {
             JSONObject jsonObject = (JSONObject) jsonParser.parse(body.get(0));
             JSONObject info = (JSONObject) jsonObject.get("info");
             JSONArray participants = (JSONArray) info.get("participants");
+
+            System.out.println(participants);
 
             String qt = findQueueType(info.get("queueId").toString());
             if (qt.equals("기타")) {
@@ -231,9 +239,10 @@ class LolApplicationTests {
             matchDTO.setMyInfoDTO(myInfoDTO);
 
 
-            System.out.println(matchDTO);
             matchDTOs.add(matchDTO);
         }
+
+        System.out.println(matchDTOs);
     }
 
     @Test
@@ -330,9 +339,10 @@ class LolApplicationTests {
                 e.printStackTrace();
             }
 
-            System.out.println(matchDTO);
             matchDTOs.add(matchDTO);
         }
+
+        System.out.println(matchDTOs);
     }
 
     public String findQueueType(String queueId) {
@@ -365,6 +375,89 @@ class LolApplicationTests {
         }
 
         return result;
+    }
+
+    public void getRes(ClientResponse res) {
+        response = res;
+    }
+
+    public ClientResponse response;
+
+    @Test
+    public void test4() {
+        String summonerName = "ㅁㅁ";
+        SummonerDTO summonerDTO = new SummonerDTO();
+        String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerName;
+
+        try {
+            WebClient webClient = WebClient.builder().baseUrl(url).build();
+            List<String> body = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("")
+                            .queryParam("api_key", myKey).build())
+                    .retrieve()
+                    .bodyToFlux(String.class)
+                    .toStream()
+                    .collect(Collectors.toList());
+
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(body.get(0));
+
+            summonerDTO.setName(jsonObject.get("name").toString());
+            summonerDTO.setId(jsonObject.get("id").toString());
+            summonerDTO.setPuuid(jsonObject.get("puuid").toString());
+            summonerDTO.setSummonerLevel(Long.parseLong(jsonObject.get("summonerLevel").toString()));
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(summonerDTO);
+    }
+
+    @Test
+    public void callLeagueEntry() {
+        LeagueEntryDTO leagueEntryDTO = new LeagueEntryDTO();
+        String url = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/" + "9DhGb4zmqh5elHNv9bLozLg5F-5iGV8GY7F_S9M1eXwjBw";
+
+        try {
+            WebClient webClient = WebClient.builder().baseUrl(url).build();
+            List<String> body = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("")
+                            .queryParam("api_key", myKey).build())
+                    .retrieve()
+                    .bodyToFlux(String.class)
+                    .toStream()
+                    .collect(Collectors.toList());
+
+            JSONParser jsonParser = new JSONParser();
+            JSONArray jsonArray = (JSONArray) jsonParser.parse(body.get(0));
+
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+
+                RankTypeDTO queueTypeDTO = new RankTypeDTO();
+
+                queueTypeDTO.setQueueType(jsonObject.get("queueType").toString());
+                queueTypeDTO.setTier(jsonObject.get("tier").toString());
+                queueTypeDTO.setRank(jsonObject.get("rank").toString());
+                queueTypeDTO.setLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
+                queueTypeDTO.setWins(Integer.parseInt(jsonObject.get("wins").toString()));
+                queueTypeDTO.setLosses(Integer.parseInt(jsonObject.get("losses").toString()));
+
+
+                if (queueTypeDTO.getQueueType().equals("RANKED_FLEX_SR")) {
+                    leagueEntryDTO.setRanked_Flex(queueTypeDTO);
+                } else {
+                    leagueEntryDTO.setRanked_Solo(queueTypeDTO);
+                }
+
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(leagueEntryDTO);
     }
 
 }

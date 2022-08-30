@@ -118,7 +118,7 @@
             </div>
 
             <div>
-                <button type="button" id="resultButton" th:onclick="callPastMatch([[${summoner.name}]])"
+                <button type="button" id="resultButton" th:onclick="callPastMatch([[${summoner.puuid}]])"
                         style="margin-top: 30px; background-color: rgba(0,0,0,0); cursor:pointer; border: none;">
                     <img src="https://cdn-icons-png.flaticon.com/512/43/43869.png"
                          style="max-width: 30px; max-height: 30px;" alt="더 보기">
@@ -155,7 +155,7 @@
                     $('#loading').show();
                     $('#resultButton').hide();
                 },
-                url: '/' + [[${summoner?.name}]] + '/' + start,
+                url: '/' + [[${summoner?.puuid}]] + '/' + start,
                 type: 'GET',
                 complete: function () {
                     $('#loading').hide();
@@ -170,13 +170,13 @@
 
     /*]]*/
 
-    function callPastMatch(summonerName) {
+    function callPastMatch(puuid) {
         $.ajax({
             beforeSend: function () {
                 $('#loading').show();
                 $('#resultButton').hide();
             },
-            url: '/' + summonerName + '/' + start,
+            url: '/' + puuid + '/' + start,
             type: 'GET',
             complete: function () {
                 $('#loading').hide();

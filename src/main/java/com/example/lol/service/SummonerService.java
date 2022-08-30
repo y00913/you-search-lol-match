@@ -64,25 +64,29 @@ public class SummonerService {
 
     public List<String> callMatchHistory(String puuid, int start) {
         List<String> result = new ArrayList();
-        String url = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/";
+        String url = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/"+ puuid;
 
         try {
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url + puuid + "/ids?start=" + start + "&count=10&api_key=" + myKey);
-            HttpResponse response = client.execute(request);
+            WebClient webClient = WebClient.builder().baseUrl(url).build();
+            List<String> body = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("/ids")
+                            .queryParam("start", 0)
+                            .queryParam("count", 10)
+                            .queryParam("api_key", myKey).build())
+                    .retrieve()
+                    .bodyToFlux(String.class)
+                    .toStream()
+                    .collect(Collectors.toList());
 
-            if (response.getStatusLine().getStatusCode() == 200) {
-                ResponseHandler<String> handler = new BasicResponseHandler();
-                String body = handler.handleResponse(response);
+            JSONParser jsonParser = new JSONParser();
+            JSONArray jsonArray = (JSONArray) jsonParser.parse(body.get(0));
 
-                JSONParser jsonParser = new JSONParser();
-                JSONArray jsonArray = (JSONArray) jsonParser.parse(body);
 
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    result.add(jsonArray.get(i).toString());
-                }
+            for (int i = 0; i < jsonArray.size(); i++) {
+                result.add(jsonArray.get(i).toString());
             }
-        } catch (IOException | ParseException e) {
+
+        } catch (ParseException e) {
             e.printStackTrace();
             return null;
         }
@@ -92,43 +96,42 @@ public class SummonerService {
 
     public LeagueEntryDTO callLeagueEntry(String id) {
         LeagueEntryDTO leagueEntryDTO = new LeagueEntryDTO();
-        String url = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/";
+        String url = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/" + id;
 
         try {
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url + id + "?api_key=" + myKey);
-            HttpResponse response = client.execute(request);
+            WebClient webClient = WebClient.builder().baseUrl(url).build();
+            List<String> body = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("")
+                            .queryParam("api_key", myKey).build())
+                    .retrieve()
+                    .bodyToFlux(String.class)
+                    .toStream()
+                    .collect(Collectors.toList());
 
-            if (response.getStatusLine().getStatusCode() == 200) {
-                ResponseHandler<String> handler = new BasicResponseHandler();
-                String body = handler.handleResponse(response);
+            JSONParser jsonParser = new JSONParser();
+            JSONArray jsonArray = (JSONArray) jsonParser.parse(body.get(0));
 
-                JSONParser jsonParser = new JSONParser();
-                JSONArray jsonArray = (JSONArray) jsonParser.parse(body);
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+                RankTypeDTO queueTypeDTO = new RankTypeDTO();
 
-                    RankTypeDTO queueTypeDTO = new RankTypeDTO();
-
-                    queueTypeDTO.setQueueType(jsonObject.get("queueType").toString());
-                    queueTypeDTO.setTier(jsonObject.get("tier").toString());
-                    queueTypeDTO.setTierUrl(iconService.callTierIcon(jsonObject.get("tier").toString()));
-                    queueTypeDTO.setRank(jsonObject.get("rank").toString());
-                    queueTypeDTO.setLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
-                    queueTypeDTO.setWins(Integer.parseInt(jsonObject.get("wins").toString()));
-                    queueTypeDTO.setLosses(Integer.parseInt(jsonObject.get("losses").toString()));
+                queueTypeDTO.setQueueType(jsonObject.get("queueType").toString());
+                queueTypeDTO.setTier(jsonObject.get("tier").toString());
+                queueTypeDTO.setTierUrl(iconService.callTierIcon(jsonObject.get("tier").toString()));
+                queueTypeDTO.setRank(jsonObject.get("rank").toString());
+                queueTypeDTO.setLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
+                queueTypeDTO.setWins(Integer.parseInt(jsonObject.get("wins").toString()));
+                queueTypeDTO.setLosses(Integer.parseInt(jsonObject.get("losses").toString()));
 
 
-                    if (queueTypeDTO.getQueueType().equals("RANKED_FLEX_SR")) {
-                        leagueEntryDTO.setRanked_Flex(queueTypeDTO);
-                    } else {
-                        leagueEntryDTO.setRanked_Solo(queueTypeDTO);
-                    }
+                if (queueTypeDTO.getQueueType().equals("RANKED_FLEX_SR")) {
+                    leagueEntryDTO.setRanked_Flex(queueTypeDTO);
+                } else {
+                    leagueEntryDTO.setRanked_Solo(queueTypeDTO);
                 }
             }
-
-        } catch (IOException | ParseException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
             return null;
         }

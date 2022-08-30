@@ -20,40 +20,33 @@ public class IndexController {
     private SummonerService summonerService;
 
     @GetMapping
-    public String index(){
+    public String index() {
 
         return "index";
     }
 
     @GetMapping("/search")
-    public String getResult(String summonerName, Model model){
+    public String getResult(String summonerName, Model model) {
         String summonerNameRepl = summonerName.replaceAll(" ","%20");
         SummonerDTO summonerDTO = summonerService.callRiotAPISummonerByName(summonerNameRepl);
 
-        if(summonerDTO.getName() != null) {
-            model.addAttribute("summoner",summonerDTO);
+        if (summonerDTO.getName() != null) {
+            model.addAttribute("summoner", summonerDTO);
             LeagueEntryDTO leagueEntry = summonerService.callLeagueEntry(summonerDTO.getId());
             model.addAttribute("leagueEntry", leagueEntry);
         }
 
-        System.out.println(summonerDTO.getName() + "   puuid : " + summonerDTO.getPuuid() + "   id : " + summonerDTO.getId());
+        System.out.println(summonerDTO.getName() + "        puuid : " + summonerDTO.getPuuid() + "      id : " + summonerDTO.getId());
 
         return "result";
     }
 
-    @GetMapping("/{summonerName}/{start}")
-    public String callMatchTable(@PathVariable String summonerName, @PathVariable int start, Model model) {
-        String summonerNameRepl = summonerName.replaceAll(" ","%20");
-        SummonerDTO summonerDTO = summonerService.callRiotAPISummonerByName(summonerNameRepl);
+    @GetMapping("/{puuid}/{start}")
+    public String callMatchTable(@PathVariable String puuid, @PathVariable int start, Model model) {
+        List<String> matchHistory = summonerService.callMatchHistory(puuid, start);
+        List<MatchDTO> matchDTOs = summonerService.callMatchAbout(matchHistory, puuid);
 
-        model.addAttribute("result",summonerDTO);
-
-        if(summonerDTO != null) {
-            List<String> matchHistory = summonerService.callMatchHistory(summonerDTO.getPuuid(), start  );
-            List<MatchDTO> matchDTOs = summonerService.callMatchAbout(matchHistory,summonerDTO.getPuuid());
-
-            model.addAttribute("matches",matchDTOs);
-        }
+        model.addAttribute("matches", matchDTOs);
 
         return "table :: body";
     }
@@ -62,7 +55,7 @@ public class IndexController {
     public String callDeatilMatchTable(@PathVariable String matchId, Model model) {
         MatchDTO matchDTO = summonerService.callDetailMatch(matchId);
 
-        model.addAttribute("match",matchDTO);
+        model.addAttribute("match", matchDTO);
 
         return "detail-table :: body";
     }
