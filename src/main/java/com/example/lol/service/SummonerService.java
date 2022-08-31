@@ -14,11 +14,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.*;
@@ -27,7 +24,6 @@ import java.util.stream.Collectors;
 @Service
 @PropertySource(value = "classpath:riotApiKey.properties")
 public class SummonerService {
-    private ObjectMapper objectMapper = new ObjectMapper();
     private IconService iconService = new IconService();
 
     @Value("${riotApiKey}")

@@ -25,7 +25,7 @@
 
                     <td style="padding-left: 150px; width: 100px">
                         <th:block th:if="${leagueEntry.Ranked_Solo != null}">
-                            <p><img th:src="${leagueEntry.Ranked_Solo.tierUrl}" width="100"
+                            <p><img th:src="@{${leagueEntry.Ranked_Solo.tierUrl}}" width="100"
                                     style="border-radius: 30px"></p>
                         </th:block>
                     </td>
@@ -58,7 +58,7 @@
 
                     <td style="padding-left: 10px; width: 100px">
                         <th:block th:if="${leagueEntry.Ranked_Flex != null}">
-                            <p><img th:src="${leagueEntry.Ranked_Flex.tierUrl}" width="100"
+                            <p><img th:src="@{${leagueEntry.Ranked_Flex.tierUrl}}" width="100"
                                     style="border-radius: 30px"></p>
                         </th:block>
                     </td>

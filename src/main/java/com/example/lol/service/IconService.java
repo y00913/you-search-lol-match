@@ -1,28 +1,18 @@
 package com.example.lol.service;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class IconService {
-    public String callSummonerIcon(String profileIconId) {
-        String url = "https://ddragon.leagueoflegends.com/cdn/12.15.1/img/profileicon/" + profileIconId + ".png";
-
-        return url;
-    }
-
     public String callTierIcon(String tier) {
-        String url = "https://opgg-static.akamaized.net/images/medals_new/" + tier + ".png?image=q_auto,f_webp,w_144&v=1660126953027";
+        String url ="/static/img/" + tier.toLowerCase() + ".png";
 
         return url;
     }
@@ -60,37 +50,37 @@ public class IconService {
     }
 
     String spellUrl;
+
     public void findUrl(String url) {
         spellUrl = url;
     }
+
     public String callSpellIcon(String spellId) {
         String url = "http://ddragon.leagueoflegends.com/cdn/12.15.1/data/en_US/summoner.json";
 
         try {
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url);
-            HttpResponse response = client.execute(request);
+            WebClient webClient = WebClient.builder().baseUrl(url).build();
+            List<String> body = webClient.get()
+                    .retrieve()
+                    .bodyToFlux(String.class)
+                    .toStream()
+                    .collect(Collectors.toList());
 
-            if (response.getStatusLine().getStatusCode() == 200) {
-                ResponseHandler<String> handler = new BasicResponseHandler();
-                String body = handler.handleResponse(response);
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(body.get(0));
+            JSONObject data = (JSONObject) jsonObject.get("data");
 
-                JSONParser jsonParser = new JSONParser();
-                JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
-                JSONObject data = (JSONObject)  jsonObject.get("data");
+            data.keySet().forEach(key -> {
+                        JSONObject spellInfo = (JSONObject) data.get(key);
 
-                data.keySet().forEach( key->{
-                            JSONObject spellInfo = (JSONObject) data.get(key);
-
-                            if(spellInfo.get("key").equals(spellId)) {
-                                JSONObject image = (JSONObject) spellInfo.get("image");
-                                String spell = "http://ddragon.leagueoflegends.com/cdn/12.15.1/img/spell/" + image.get("full").toString();
-                                findUrl(spell);
-                            }
+                        if (spellInfo.get("key").equals(spellId)) {
+                            JSONObject image = (JSONObject) spellInfo.get("image");
+                            String spell = "http://ddragon.leagueoflegends.com/cdn/12.15.1/img/spell/" + image.get("full").toString();
+                            findUrl(spell);
                         }
-                );
-            }
-        } catch (IOException | ParseException e) {
+                    }
+            );
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 
