@@ -14,8 +14,11 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.*;
@@ -32,11 +35,11 @@ public class SummonerService {
 
     public SummonerDTO callRiotAPISummonerByName(String summonerName) {
         SummonerDTO summonerDTO = new SummonerDTO();
-        String serverUrl = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/";
+        String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerName;
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(serverUrl + summonerName + "?api_key=" + myKey);
+            HttpGet request = new HttpGet(url + "?api_key=" + myKey);
             HttpResponse response = client.execute(request);
 
             if (response.getStatusLine().getStatusCode() == 200) {
@@ -64,7 +67,7 @@ public class SummonerService {
 
     public List<String> callMatchHistory(String puuid, int start) {
         List<String> result = new ArrayList();
-        String url = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/"+ puuid;
+        String url = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid;
 
         try {
             WebClient webClient = WebClient.builder().baseUrl(url).build();
@@ -237,66 +240,64 @@ public class SummonerService {
     }
 
     public MatchDTO callDetailMatch(String matchId) {
-        String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + myKey;
+        String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId;
         MatchDTO matchDTO = new MatchDTO();
 
         try {
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url);
-            HttpResponse response = client.execute(request);
+            WebClient webClient = WebClient.builder().baseUrl(url).build();
+            List<String> body = webClient.get()
+                    .uri(uriBuilder -> uriBuilder.path("")
+                            .queryParam("api_key", myKey).build())
+                    .retrieve()
+                    .bodyToFlux(String.class)
+                    .toStream()
+                    .collect(Collectors.toList());
 
-            if (response.getStatusLine().getStatusCode() == 200) {
-                ResponseHandler<String> handler = new BasicResponseHandler();
-                String body = handler.handleResponse(response);
+            JSONParser jsonParser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(body.get(0));
+            JSONObject info = (JSONObject) jsonObject.get("info");
+            JSONArray participants = (JSONArray) info.get("participants");
 
-                JSONParser jsonParser = new JSONParser();
-                JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
-                JSONObject info = (JSONObject) jsonObject.get("info");
-                JSONArray participants = (JSONArray) info.get("participants");
+            List<MatchUserInfoDTO> matchUserInfoDTOs = new ArrayList<>();
+            for (int i = 0; i < participants.size(); i++) {
+                JSONObject participant = (JSONObject) participants.get(i);
+                MatchUserInfoDTO matchUserInfoDTO = new MatchUserInfoDTO();
 
-                List<MatchUserInfoDTO> matchUserInfoDTOs = new ArrayList<>();
-                for (int i = 0; i < participants.size(); i++) {
-                    JSONObject participant = (JSONObject) participants.get(i);
-                    MatchUserInfoDTO matchUserInfoDTO = new MatchUserInfoDTO();
+                matchUserInfoDTO.setSummonerName(participant.get("summonerName").toString());
 
-                    matchUserInfoDTO.setSummonerName(participant.get("summonerName").toString());
+                matchUserInfoDTO.setWin((boolean) participant.get("win"));
+                matchUserInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
+                matchUserInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
+                matchUserInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
+                matchUserInfoDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
+                matchUserInfoDTO.setTotalMinionsKilled(Integer.parseInt(participant.get("totalMinionsKilled").toString()));
+                matchUserInfoDTO.setTotalDamageDealtToChampions(Integer.parseInt(participant.get("totalDamageDealtToChampions").toString()));
 
-                    matchUserInfoDTO.setWin((boolean) participant.get("win"));
-                    matchUserInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
-                    matchUserInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
-                    matchUserInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
-                    matchUserInfoDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
-                    matchUserInfoDTO.setTotalMinionsKilled(Integer.parseInt(participant.get("totalMinionsKilled").toString()));
-                    matchUserInfoDTO.setTotalDamageDealtToChampions(Integer.parseInt(participant.get("totalDamageDealtToChampions").toString()));
+                List<String> items = new ArrayList<>();
 
-                    List<String> items = new ArrayList<>();
-
-                    for (int j = 0; j <= 6; j++) {
-                        items.add(iconService.callItemIcon(participant.get("item" + j).toString()));
-                    }
-
-                    matchUserInfoDTO.setItems(items);
-
-                    JSONObject perks = (JSONObject) participant.get("perks");
-                    JSONArray styles = (JSONArray) perks.get("styles");
-                    JSONObject primaryStyle = (JSONObject) styles.get(0);
-                    JSONObject subStyle = (JSONObject) styles.get(1);
-                    JSONArray primarySelections = (JSONArray) primaryStyle.get("selections");
-                    JSONObject primarySelectionsNumber = (JSONObject) primarySelections.get(0);
-
-                    matchUserInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
-                    matchUserInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
-                    matchUserInfoDTO.setSpell1Id(iconService.callSpellIcon(participant.get("summoner1Id").toString()));
-                    matchUserInfoDTO.setSpell2Id(iconService.callSpellIcon(participant.get("summoner2Id").toString()));
-
-                    matchUserInfoDTOs.add(matchUserInfoDTO);
+                for (int j = 0; j <= 6; j++) {
+                    items.add(iconService.callItemIcon(participant.get("item" + j).toString()));
                 }
 
-                matchDTO.setMatchUserInfoDTOs(matchUserInfoDTOs);
-            } else {
-                System.out.println("error : " + response.getStatusLine().getStatusCode());
+                matchUserInfoDTO.setItems(items);
+
+                JSONObject perks = (JSONObject) participant.get("perks");
+                JSONArray styles = (JSONArray) perks.get("styles");
+                JSONObject primaryStyle = (JSONObject) styles.get(0);
+                JSONObject subStyle = (JSONObject) styles.get(1);
+                JSONArray primarySelections = (JSONArray) primaryStyle.get("selections");
+                JSONObject primarySelectionsNumber = (JSONObject) primarySelections.get(0);
+
+                matchUserInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
+                matchUserInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
+                matchUserInfoDTO.setSpell1Id(iconService.callSpellIcon(participant.get("summoner1Id").toString()));
+                matchUserInfoDTO.setSpell2Id(iconService.callSpellIcon(participant.get("summoner2Id").toString()));
+
+                matchUserInfoDTOs.add(matchUserInfoDTO);
             }
-        } catch (ParseException | IOException e) {
+
+            matchDTO.setMatchUserInfoDTOs(matchUserInfoDTOs);
+        } catch (ParseException e) {
             e.printStackTrace();
             return null;
         }
