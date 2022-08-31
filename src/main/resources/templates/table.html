@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <div th:replace="index :: fragment-header"></div>
+    <div th:replace="index :: fragment-head"></div>
 </head>
 <body>
 
@@ -133,7 +133,7 @@
 <script>
     function callDetailMatch(matchId) {
         $.ajax({
-            url: '/detail' + '/' + matchId,
+            url: '/detail/' + matchId,
             type: 'GET',
             beforeSend: function () {
                 $('#loading' + matchId).show();

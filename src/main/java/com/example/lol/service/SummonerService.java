@@ -32,11 +32,11 @@ public class SummonerService {
 
     public SummonerDTO callRiotAPISummonerByName(String summonerName) {
         SummonerDTO summonerDTO = new SummonerDTO();
-        String serverUrl = "https://kr.api.riotgames.com";
+        String serverUrl = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/";
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(serverUrl + "/lol/summoner/v4/summoners/by-name/" + summonerName + "?api_key=" + myKey);
+            HttpGet request = new HttpGet(serverUrl + summonerName + "?api_key=" + myKey);
             HttpResponse response = client.execute(request);
 
             if (response.getStatusLine().getStatusCode() == 200) {
@@ -49,7 +49,7 @@ public class SummonerService {
                 summonerDTO.setName(jsonObject.get("name").toString());
                 summonerDTO.setId(jsonObject.get("id").toString());
                 summonerDTO.setPuuid(jsonObject.get("puuid").toString());
-                summonerDTO.setProfileIcon(iconService.callSummonerIcon(jsonObject.get("profileIconId").toString()));
+                summonerDTO.setProfileIcon(jsonObject.get("profileIconId").toString());
                 summonerDTO.setSummonerLevel(Long.parseLong(jsonObject.get("summonerLevel").toString()));
             } else {
                 System.out.println("error : " + response.getStatusLine().getStatusCode());

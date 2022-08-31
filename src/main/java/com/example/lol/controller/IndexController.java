@@ -3,7 +3,6 @@ package com.example.lol.controller;
 import com.example.lol.dto.LeagueEntryDTO;
 import com.example.lol.dto.MatchDTO;
 import com.example.lol.dto.SummonerDTO;
-import com.example.lol.service.IconService;
 import com.example.lol.service.SummonerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -32,13 +31,22 @@ public class IndexController {
 
         if (summonerDTO.getName() != null) {
             model.addAttribute("summoner", summonerDTO);
-            LeagueEntryDTO leagueEntry = summonerService.callLeagueEntry(summonerDTO.getId());
-            model.addAttribute("leagueEntry", leagueEntry);
         }
 
-        System.out.println(summonerDTO.getName() + "        puuid : " + summonerDTO.getPuuid() + "      id : " + summonerDTO.getId());
+        System.out.println(summonerDTO);
 
         return "result";
+    }
+
+    @GetMapping("/{id}/{name}/{summonerLevel}/{profileIcon}")
+    public String callLeagueInfo(@PathVariable String id, @PathVariable String name, @PathVariable String summonerLevel, @PathVariable String profileIcon, Model model){
+        LeagueEntryDTO leagueEntry = summonerService.callLeagueEntry(id);
+        model.addAttribute("leagueEntry", leagueEntry);
+        model.addAttribute("name", name);
+        model.addAttribute("summonerLevel", summonerLevel);
+        model.addAttribute("profileIcon", "https://ddragon.leagueoflegends.com/cdn/12.15.1/img/profileicon/" + profileIcon + ".png");
+
+        return "league-info";
     }
 
     @GetMapping("/{puuid}/{start}")
