@@ -11,6 +11,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class IconService {
+    private String version = "12.16.1";
+
+    public String callProfileIcon(String profileIcon){
+        String url = "https://ddragon.leagueoflegends.com/cdn/" + version + "/img/profileicon/" + profileIcon + ".png";
+
+        return url;
+    }
+
     public String callTierIcon(String tier) {
         String url ="/static/img/" + tier.toLowerCase() + ".png";
 
@@ -18,7 +26,7 @@ public class IconService {
     }
 
     public String callItemIcon(String item) {
-        String url = "http://ddragon.leagueoflegends.com/cdn/12.15.1/img/item/" + item + ".png";
+        String url = "http://ddragon.leagueoflegends.com/cdn/" + version + "/img/item/" + item + ".png";
 
         if (item.equals("0")) {
             url = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Regular_quadrilateral.svg/220px-Regular_quadrilateral.svg.png";
@@ -28,10 +36,10 @@ public class IconService {
     }
 
     public String callChampionIcon(String champion) {
-        String url = "http://ddragon.leagueoflegends.com/cdn/12.15.1/img/champion/" + champion + ".png";
+        String url = "http://ddragon.leagueoflegends.com/cdn/" + version + "/img/champion/" + champion + ".png";
 
         if (champion.equals("FiddleSticks")) {
-            url = "http://ddragon.leagueoflegends.com/cdn/12.15.1/img/champion/" + "Fiddlesticks" + ".png";
+            url = "http://ddragon.leagueoflegends.com/cdn/" + version + "/img/champion/" + "Fiddlesticks" + ".png";
         }
 
         return url;
@@ -56,7 +64,7 @@ public class IconService {
     }
 
     public String callSpellIcon(String spellId) {
-        String url = "http://ddragon.leagueoflegends.com/cdn/12.15.1/data/en_US/summoner.json";
+        String url = "http://ddragon.leagueoflegends.com/cdn/" + version + "/data/en_US/summoner.json";
 
         try {
             WebClient webClient = WebClient.builder().baseUrl(url).build();
@@ -75,7 +83,7 @@ public class IconService {
 
                         if (spellInfo.get("key").equals(spellId)) {
                             JSONObject image = (JSONObject) spellInfo.get("image");
-                            String spell = "http://ddragon.leagueoflegends.com/cdn/12.15.1/img/spell/" + image.get("full").toString();
+                            String spell = "http://ddragon.leagueoflegends.com/cdn/" + version + "/img/spell/" + image.get("full").toString();
                             findUrl(spell);
                         }
                     }

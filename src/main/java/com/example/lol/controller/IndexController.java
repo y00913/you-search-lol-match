@@ -3,6 +3,7 @@ package com.example.lol.controller;
 import com.example.lol.dto.LeagueEntryDTO;
 import com.example.lol.dto.MatchDTO;
 import com.example.lol.dto.SummonerDTO;
+import com.example.lol.service.IconService;
 import com.example.lol.service.SummonerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ public class IndexController {
 
     @Autowired
     private SummonerService summonerService;
+    private IconService iconService = new IconService();
 
     @GetMapping
     public String index() {
@@ -44,7 +46,7 @@ public class IndexController {
         model.addAttribute("leagueEntry", leagueEntry);
         model.addAttribute("name", name);
         model.addAttribute("summonerLevel", summonerLevel);
-        model.addAttribute("profileIcon", "https://ddragon.leagueoflegends.com/cdn/12.15.1/img/profileicon/" + profileIcon + ".png");
+        model.addAttribute("profileIcon", iconService.callProfileIcon(profileIcon));
 
         return "league-info";
     }
