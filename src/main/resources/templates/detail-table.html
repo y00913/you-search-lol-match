@@ -20,6 +20,7 @@
         <th></th>
         <th></th>
         <th></th>
+        <th></th>
         <th>KDA</th>
         <th>cs</th>
         <th>피해량</th>
@@ -29,6 +30,11 @@
     <tr th:each="userInfo : ${match.matchUserInfoDTOs}">
         <td><img th:src="${userInfo.championName}" width="40"
                  style="border-radius: 70px">
+        </td>
+        <td>
+            <div style="font-weight: bold; text-align: center;">
+                <p th:text="${userInfo.champLevel}"></p>
+            </div>
         </td>
         <td>
             <div style="vertical-align: top">

@@ -13,6 +13,7 @@ public class MatchUserInfoDTO {
     private String summonerName;
     private boolean win;
     private String championName;
+    private int champLevel;
     private int kills;
     private int deaths;
     private int assists;

@@ -263,6 +263,7 @@ public class SummonerService {
 
                 matchUserInfoDTO.setWin((boolean) participant.get("win"));
                 matchUserInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
+                matchUserInfoDTO.setChampLevel(Integer.parseInt(participant.get("champLevel").toString()));
                 matchUserInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
                 matchUserInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
                 matchUserInfoDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
