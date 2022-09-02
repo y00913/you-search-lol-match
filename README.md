@@ -2,16 +2,19 @@
 스프링부트와 라이엇 api를 활용한 전적 검색 사이트
 https://yose.ml
 
-## 작업 기간
+
+# 작업 기간
 22-08 ~ 22-08 3
 
-## 기술 스택
+
+# 기술 스택
 - springboot
 - Riot api
 - thymeleaf
 - jQuery
 
-## 화면 구성
+
+# 화면 구성
 - 초기 화면
 ![](https://velog.velcdn.com/images/y00913/post/1e6468da-0717-432e-aa7e-61371a062b69/image.png)
 - 검색 화면
