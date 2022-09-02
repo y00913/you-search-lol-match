@@ -23,7 +23,7 @@
 <div class="center-screen">
     <div th:fragment="search">
         <div style="font-size: 2em; font-weight: bold; margin-bottom: 40px">
-            <p>Search Match</p>
+            <p><a href="/" style="text-decoration: none; color: black;">Search Match</a></p>
         </div>
 
         <form th:action="@{/search}" method="get">
@@ -42,7 +42,7 @@
     </div>
 
     <p style="font-weight: bold; margin-top: 60px">
-        made by <a th:href="@{https://github.com/y00913}">y00913</a>
+        made by <a th:href="@{https://github.com/y00913}" target="_blank" style="text-decoration: none;">y00913</a>
     </p>
 </div>
 
