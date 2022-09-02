@@ -24,5 +24,6 @@ https://yose.ml
 
 
 # 주의 사항
-riot api key가 필요합니다. https://developer.riotgames.com/ 이 곳에서 key를 발급 받은 후, ![image](https://user-images.githubusercontent.com/42912205/188107260-c9cc06db-71a4-46bb-bbfd-ddffc2bcc865.png)
+riot api key가 필요합니다. https://developer.riotgames.com/ 이 곳에서 key를 발급 받은 후, 
+![image](https://user-images.githubusercontent.com/42912205/188107260-c9cc06db-71a4-46bb-bbfd-ddffc2bcc865.png)
 위와 같이 resource 폴더에 ```riotApiKey=발급받은apikey``` 와 같은 방식으로 저장해주시기 바랍니다.
