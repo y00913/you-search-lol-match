@@ -21,15 +21,15 @@ public class ExceptionHandlingController implements ErrorController {
             System.out.println(statusCode);
 
             if (statusCode == HttpStatus.NOT_FOUND.value()) {
-                return "/error/404";
+                return "error/404";
             }
 
             if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
-                return "/error/500";
+                return "error/500";
             }
         }
 
-        return "/error/error";
+        return "error/error";
     }
 
 }
