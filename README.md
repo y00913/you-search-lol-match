@@ -21,3 +21,8 @@ https://yose.ml
 ![](https://velog.velcdn.com/images/y00913/post/60497c6f-90e3-46e5-8591-3c5f02f890ac/image.png)
 - 더보기 화면
 ![](https://velog.velcdn.com/images/y00913/post/fba0235e-68a4-4da8-bdad-e097b658f3be/image.png)
+
+
+# 주의 사항
+riot api key가 필요합니다. https://developer.riotgames.com/ 이 곳에서 key를 발급 받은 후, ![image](https://user-images.githubusercontent.com/42912205/188107260-c9cc06db-71a4-46bb-bbfd-ddffc2bcc865.png)
+위와 같이 resource 폴더에 ```riotApiKey=발급받은apikey``` 와 같은 방식으로 저장해주시기 바랍니다.
