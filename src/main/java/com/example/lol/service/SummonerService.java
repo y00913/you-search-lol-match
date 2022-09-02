@@ -1,7 +1,6 @@
 package com.example.lol.service;
 
 import com.example.lol.dto.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -12,6 +11,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,8 @@ import java.util.stream.Collectors;
 @Service
 @PropertySource(value = "classpath:riotApiKey.properties")
 public class SummonerService {
-    private IconService iconService = new IconService();
+    @Autowired
+    private IconService iconService;
 
     @Value("${riotApiKey}")
     private String myKey;
@@ -69,7 +70,7 @@ public class SummonerService {
             WebClient webClient = WebClient.builder().baseUrl(url).build();
             List<String> body = webClient.get()
                     .uri(uriBuilder -> uriBuilder.path("/ids")
-                            .queryParam("start", 0)
+                            .queryParam("start", start)
                             .queryParam("count", 10)
                             .queryParam("api_key", myKey).build())
                     .retrieve()

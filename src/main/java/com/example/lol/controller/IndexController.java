@@ -18,7 +18,9 @@ public class IndexController {
 
     @Autowired
     private SummonerService summonerService;
-    private IconService iconService = new IconService();
+
+    @Autowired
+    private IconService iconService;
 
     @GetMapping
     public String index() {
