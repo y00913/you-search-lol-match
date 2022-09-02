@@ -1,5 +1,6 @@
 # 롤 전적 검색 사이트
 스프링부트와 라이엇 api를 활용한 전적 검색 사이트
+
 https://yose.ml
 
 
@@ -8,9 +9,9 @@ https://yose.ml
 
 
 # 기술 스택
-- springboot
+- Springboot
 - Riot api
-- thymeleaf
+- Thymeleaf
 - jQuery
 
 
