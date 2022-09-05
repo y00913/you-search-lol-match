@@ -12,7 +12,6 @@ import java.util.List;
 public class MatchDTO {
     private String matchId;
     private String queueType;
-    private List<MatchUserInfoDTO> matchUserInfoDTOs;
     private Long gameDurationMinutes;
     private Long gameDurationSeconds;
     private boolean win;

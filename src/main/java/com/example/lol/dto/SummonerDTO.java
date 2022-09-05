@@ -12,5 +12,5 @@ public class SummonerDTO {
     private String id;
     private String puuid;
     private String profileIcon;
-    private long summonerLevel;
+    private Long summonerLevel;
 }

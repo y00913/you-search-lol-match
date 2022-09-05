@@ -236,9 +236,9 @@ public class SummonerService {
         return matchDTOs;
     }
 
-    public MatchDTO callDetailMatch(String matchId) {
+    public List<MatchUserInfoDTO> callDetailMatch(String matchId) {
         String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId;
-        MatchDTO matchDTO = new MatchDTO();
+        List<MatchUserInfoDTO> matchUserInfoDTOs = new ArrayList<>();
 
         try {
             WebClient webClient = WebClient.builder().baseUrl(url).build();
@@ -255,7 +255,6 @@ public class SummonerService {
             JSONObject info = (JSONObject) jsonObject.get("info");
             JSONArray participants = (JSONArray) info.get("participants");
 
-            List<MatchUserInfoDTO> matchUserInfoDTOs = new ArrayList<>();
             for (int i = 0; i < participants.size(); i++) {
                 JSONObject participant = (JSONObject) participants.get(i);
                 MatchUserInfoDTO matchUserInfoDTO = new MatchUserInfoDTO();
@@ -293,14 +292,12 @@ public class SummonerService {
 
                 matchUserInfoDTOs.add(matchUserInfoDTO);
             }
-
-            matchDTO.setMatchUserInfoDTOs(matchUserInfoDTOs);
         } catch (ParseException e) {
             e.printStackTrace();
             return null;
         }
 
-        return matchDTO;
+        return matchUserInfoDTOs;
     }
 
     public String findQueueType(String queueId) {

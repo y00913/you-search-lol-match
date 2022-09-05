@@ -2,6 +2,7 @@ package com.example.lol.controller;
 
 import com.example.lol.dto.LeagueEntryDTO;
 import com.example.lol.dto.MatchDTO;
+import com.example.lol.dto.MatchUserInfoDTO;
 import com.example.lol.dto.SummonerDTO;
 import com.example.lol.service.IconService;
 import com.example.lol.service.SummonerService;
@@ -65,9 +66,9 @@ public class IndexController {
 
     @GetMapping("/detail/{matchId}")
     public String callDeatilMatchTable(@PathVariable String matchId, Model model) {
-        MatchDTO matchDTO = summonerService.callDetailMatch(matchId);
+        List<MatchUserInfoDTO> matchUserInfoDTOs = summonerService.callDetailMatch(matchId);
 
-        model.addAttribute("match", matchDTO);
+        model.addAttribute("matchInfo", matchUserInfoDTOs);
 
         return "detail-table :: body";
     }

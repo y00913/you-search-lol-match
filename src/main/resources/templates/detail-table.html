@@ -27,7 +27,7 @@
         <th>아이탬</th>
     </tr>
 
-    <tr th:each="userInfo : ${match.matchUserInfoDTOs}">
+    <tr th:each="userInfo : ${matchInfo}">
         <td><img th:src="${userInfo.championName}" width="40"
                  style="border-radius: 70px">
         </td>
