@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LeagueEntryDTO {
-    private RankTypeDTO Ranked_Flex;
-    private RankTypeDTO Ranked_Solo;
+public class LeagueEntry {
+    private RankTypeFlex Ranked_Flex;
+    private RankTypeSolo Ranked_Solo;
 }

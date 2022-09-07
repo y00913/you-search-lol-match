@@ -1,6 +1,7 @@
 package com.example.lol.service;
 
 import com.example.lol.dto.*;
+import com.example.lol.repository.*;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -27,11 +28,26 @@ public class SummonerService {
     @Autowired
     private IconService iconService;
 
+    @Autowired
+    SummonerRepository summonerRepository;
+
+    @Autowired
+    RankTypeFlexRepository rankTypeFlexRepository;
+
+    @Autowired
+    RankTypeSoloRepository rankTypeSoloRepository;
+
+    @Autowired
+    MatchRepository matchRepository;
+
+    @Autowired
+    MyInfoRepository myInfoRepository;
+
     @Value("${riotApiKey}")
     private String myKey;
 
-    public SummonerDTO callRiotAPISummonerByName(String summonerName) {
-        SummonerDTO summonerDTO = new SummonerDTO();
+    public Summoner callRiotAPISummonerByName(String summonerName) {
+        Summoner summonerDTO = new Summoner();
         String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerName;
 
         try {
@@ -51,6 +67,10 @@ public class SummonerService {
                 summonerDTO.setPuuid(jsonObject.get("puuid").toString());
                 summonerDTO.setProfileIcon(jsonObject.get("profileIconId").toString());
                 summonerDTO.setSummonerLevel(Long.parseLong(jsonObject.get("summonerLevel").toString()));
+
+                if(summonerRepository.findByPuuid(summonerDTO.getPuuid()) == null) {
+                    summonerRepository.save(summonerDTO);
+                }
             } else {
                 System.out.println("error : " + response.getStatusLine().getStatusCode());
             }
@@ -94,8 +114,8 @@ public class SummonerService {
         return result;
     }
 
-    public LeagueEntryDTO callLeagueEntry(String id) {
-        LeagueEntryDTO leagueEntryDTO = new LeagueEntryDTO();
+    public LeagueEntry callLeagueEntry(String id) {
+        LeagueEntry leagueEntryDTO = new LeagueEntry();
         String url = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/" + id;
 
         try {
@@ -114,21 +134,37 @@ public class SummonerService {
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 
-                RankTypeDTO queueTypeDTO = new RankTypeDTO();
+                RankTypeFlex rankTypeFlex = new RankTypeFlex();
+                RankTypeSolo rankTypeSolo = new RankTypeSolo();
 
-                queueTypeDTO.setQueueType(jsonObject.get("queueType").toString());
-                queueTypeDTO.setTier(jsonObject.get("tier").toString());
-                queueTypeDTO.setTierUrl(iconService.callTierIcon(jsonObject.get("tier").toString()));
-                queueTypeDTO.setRank(jsonObject.get("rank").toString());
-                queueTypeDTO.setLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
-                queueTypeDTO.setWins(Integer.parseInt(jsonObject.get("wins").toString()));
-                queueTypeDTO.setLosses(Integer.parseInt(jsonObject.get("losses").toString()));
+                if (jsonObject.get("queueType").toString().equals("RANKED_FLEX_SR")) {
+                    rankTypeFlex.setId(id);
+                    rankTypeFlex.setQueueType(jsonObject.get("queueType").toString());
+                    rankTypeFlex.setUserTier(jsonObject.get("tier").toString());
+                    rankTypeFlex.setUserTierUrl(iconService.callTierIcon(jsonObject.get("tier").toString()));
+                    rankTypeFlex.setUserRank(jsonObject.get("rank").toString());
+                    rankTypeFlex.setLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
+                    rankTypeFlex.setUserWins(Integer.parseInt(jsonObject.get("wins").toString()));
+                    rankTypeFlex.setUserLosses(Integer.parseInt(jsonObject.get("losses").toString()));
 
-
-                if (queueTypeDTO.getQueueType().equals("RANKED_FLEX_SR")) {
-                    leagueEntryDTO.setRanked_Flex(queueTypeDTO);
+                    leagueEntryDTO.setRanked_Flex(rankTypeFlex);
+                    if(rankTypeFlexRepository.findById(id) == null){
+                        rankTypeFlexRepository.save(rankTypeFlex);
+                    }
                 } else {
-                    leagueEntryDTO.setRanked_Solo(queueTypeDTO);
+                    rankTypeSolo.setId(id);
+                    rankTypeSolo.setQueueType(jsonObject.get("queueType").toString());
+                    rankTypeSolo.setUserTier(jsonObject.get("tier").toString());
+                    rankTypeSolo.setUserTierUrl(iconService.callTierIcon(jsonObject.get("tier").toString()));
+                    rankTypeSolo.setUserRank(jsonObject.get("rank").toString());
+                    rankTypeSolo.setLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
+                    rankTypeSolo.setUserWins(Integer.parseInt(jsonObject.get("wins").toString()));
+                    rankTypeSolo.setUserLosses(Integer.parseInt(jsonObject.get("losses").toString()));
+
+                    leagueEntryDTO.setRanked_Solo(rankTypeSolo);
+                    if(rankTypeSoloRepository.findById(id) == null){
+                        rankTypeSoloRepository.save(rankTypeSolo);
+                    }
                 }
             }
         } catch (ParseException e) {
@@ -139,13 +175,14 @@ public class SummonerService {
         return leagueEntryDTO;
     }
 
-    public List<MatchDTO> callMatchAbout(List<String> matchHistory, String puuid) {
-        List<MatchDTO> matchDTOs = new ArrayList<>();
+    public List<Match> callMatchAbout(List<String> matchHistory, String puuid) {
+        List<Match> matchDTOs = new ArrayList<>();
 
         for (String matchId : matchHistory) {
             String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + myKey;
-            MatchDTO matchDTO = new MatchDTO();
+            Match matchDTO = new Match();
 
+            matchDTO.setPuuid(puuid);
             matchDTO.setMatchId(matchId);
 
             try {
@@ -168,6 +205,7 @@ public class SummonerService {
                     continue;
                 }
                 matchDTO.setQueueType(qt);
+                matchDTO.setEndTimeStamp(Long.parseLong(info.get("gameEndTimestamp").toString()));
 
                 long timestamp = (System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString())) / 1000;
                 if (timestamp < 60) {
@@ -191,7 +229,7 @@ public class SummonerService {
                 matchDTO.setGameDurationMinutes(gameDuration / 60);
                 matchDTO.setGameDurationSeconds(gameDuration % 60);
 
-                MyInfoDTO myInfoDTO = new MyInfoDTO();
+                MyInfo myInfoDTO = new MyInfo();
                 for (int i = 0; i < participants.size(); i++) {
                     JSONObject participant = (JSONObject) participants.get(i);
 
@@ -225,20 +263,25 @@ public class SummonerService {
 
                 matchDTO.setMyInfoDTO(myInfoDTO);
 
+                if(matchRepository.findByMatchId(matchId) == null){
+                    myInfoRepository.save(myInfoDTO);
+                    matchRepository.save(matchDTO);
+                }
             } catch (ParseException e) {
                 e.printStackTrace();
                 return null;
             }
 
             matchDTOs.add(matchDTO);
+
         }
 
         return matchDTOs;
     }
 
-    public List<MatchUserInfoDTO> callDetailMatch(String matchId) {
+    public List<MatchUserInfo> callDetailMatch(String matchId) {
         String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId;
-        List<MatchUserInfoDTO> matchUserInfoDTOs = new ArrayList<>();
+        List<MatchUserInfo> matchUserInfoDTOs = new ArrayList<>();
 
         try {
             WebClient webClient = WebClient.builder().baseUrl(url).build();
@@ -257,7 +300,7 @@ public class SummonerService {
 
             for (int i = 0; i < participants.size(); i++) {
                 JSONObject participant = (JSONObject) participants.get(i);
-                MatchUserInfoDTO matchUserInfoDTO = new MatchUserInfoDTO();
+                MatchUserInfo matchUserInfoDTO = new MatchUserInfo();
 
                 matchUserInfoDTO.setSummonerName(participant.get("summonerName").toString());
 

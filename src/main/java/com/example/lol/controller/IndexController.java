@@ -1,9 +1,9 @@
 package com.example.lol.controller;
 
-import com.example.lol.dto.LeagueEntryDTO;
-import com.example.lol.dto.MatchDTO;
-import com.example.lol.dto.MatchUserInfoDTO;
-import com.example.lol.dto.SummonerDTO;
+import com.example.lol.dto.LeagueEntry;
+import com.example.lol.dto.Match;
+import com.example.lol.dto.MatchUserInfo;
+import com.example.lol.dto.Summoner;
 import com.example.lol.service.IconService;
 import com.example.lol.service.SummonerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class IndexController {
     @GetMapping("/search")
     public String getResult(String summonerName, Model model) {
         String summonerNameRepl = summonerName.replaceAll(" ","%20");
-        SummonerDTO summonerDTO = summonerService.callRiotAPISummonerByName(summonerNameRepl);
+        Summoner summonerDTO = summonerService.callRiotAPISummonerByName(summonerNameRepl);
 
         if (summonerDTO.getName() != null) {
             model.addAttribute("summoner", summonerDTO);
@@ -45,7 +45,7 @@ public class IndexController {
 
     @GetMapping("/{id}/{name}/{summonerLevel}/{profileIcon}")
     public String callLeagueInfo(@PathVariable String id, @PathVariable String name, @PathVariable String summonerLevel, @PathVariable String profileIcon, Model model){
-        LeagueEntryDTO leagueEntry = summonerService.callLeagueEntry(id);
+        LeagueEntry leagueEntry = summonerService.callLeagueEntry(id);
         model.addAttribute("leagueEntry", leagueEntry);
         model.addAttribute("name", name);
         model.addAttribute("summonerLevel", summonerLevel);
@@ -57,7 +57,7 @@ public class IndexController {
     @GetMapping("/{puuid}/{start}")
     public String callMatchTable(@PathVariable String puuid, @PathVariable int start, Model model) {
         List<String> matchHistory = summonerService.callMatchHistory(puuid, start);
-        List<MatchDTO> matchDTOs = summonerService.callMatchAbout(matchHistory, puuid);
+        List<Match> matchDTOs = summonerService.callMatchAbout(matchHistory, puuid);
 
         model.addAttribute("matches", matchDTOs);
 
@@ -66,7 +66,7 @@ public class IndexController {
 
     @GetMapping("/detail/{matchId}")
     public String callDeatilMatchTable(@PathVariable String matchId, Model model) {
-        List<MatchUserInfoDTO> matchUserInfoDTOs = summonerService.callDetailMatch(matchId);
+        List<MatchUserInfo> matchUserInfoDTOs = summonerService.callDetailMatch(matchId);
 
         model.addAttribute("matchInfo", matchUserInfoDTOs);
 

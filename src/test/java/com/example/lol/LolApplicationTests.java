@@ -1,7 +1,6 @@
 package com.example.lol;
 
 import com.example.lol.dto.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -16,10 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,7 +41,7 @@ class LolApplicationTests {
 
     @Test
     public void callRiotAPISummonerByName() {
-        SummonerDTO summonerDTO = new SummonerDTO();
+        Summoner summonerDTO = new Summoner();
         String serverUrl = "https://kr.api.riotgames.com";
         String summonerName = "hide%20on%20bush";
 
@@ -150,13 +147,13 @@ class LolApplicationTests {
 
     @Test
     public void test3() throws ParseException {
-        List<MatchDTO> matchDTOs = new ArrayList<>();
+        List<Match> matchDTOs = new ArrayList<>();
         List<String> matchHistory = callMatchHistory();
         String puuid = "zohfVkLTI7DpNsI6-JU5GzsAUQACJTiN6XV8nCIKkJS42lyDUFU4gG-OdGtoHx1JxMopLmXXNXUSMQ";
 
         for (String matchId : matchHistory) {
             String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + myKey;
-            MatchDTO matchDTO = new MatchDTO();
+            Match matchDTO = new Match();
 
             matchDTO.setMatchId(matchId);
 
@@ -204,7 +201,7 @@ class LolApplicationTests {
             matchDTO.setGameDurationMinutes(gameDuration / 60);
             matchDTO.setGameDurationSeconds(gameDuration % 60);
 
-            MyInfoDTO myInfoDTO = new MyInfoDTO();
+            MyInfo myInfoDTO = new MyInfo();
             for (int i = 0; i < participants.size(); i++) {
                 JSONObject participant = (JSONObject) participants.get(i);
 
@@ -247,13 +244,13 @@ class LolApplicationTests {
 
     @Test
     public void callMatchAbout() {
-        List<MatchDTO> matchDTOs = new ArrayList<>();
+        List<Match> matchDTOs = new ArrayList<>();
         List<String> matchHistory = callMatchHistory();
         String puuid = "zohfVkLTI7DpNsI6-JU5GzsAUQACJTiN6XV8nCIKkJS42lyDUFU4gG-OdGtoHx1JxMopLmXXNXUSMQ";
 
         for (String matchId : matchHistory) {
             String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + myKey;
-            MatchDTO matchDTO = new MatchDTO();
+            Match matchDTO = new Match();
 
             matchDTO.setMatchId(matchId);
 
@@ -299,7 +296,7 @@ class LolApplicationTests {
                     matchDTO.setGameDurationMinutes(gameDuration / 60);
                     matchDTO.setGameDurationSeconds(gameDuration % 60);
 
-                    MyInfoDTO myInfoDTO = new MyInfoDTO();
+                    MyInfo myInfoDTO = new MyInfo();
                     for (int i = 0; i < participants.size(); i++) {
                         JSONObject participant = (JSONObject) participants.get(i);
 
@@ -386,7 +383,7 @@ class LolApplicationTests {
     @Test
     public void test4() {
         String summonerName = "ㅁㅁ";
-        SummonerDTO summonerDTO = new SummonerDTO();
+        Summoner summonerDTO = new Summoner();
         String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerName;
 
         try {
@@ -416,7 +413,7 @@ class LolApplicationTests {
 
     @Test
     public void callLeagueEntry() {
-        LeagueEntryDTO leagueEntryDTO = new LeagueEntryDTO();
+        LeagueEntry leagueEntryDTO = new LeagueEntry();
         String url = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/" + "9DhGb4zmqh5elHNv9bLozLg5F-5iGV8GY7F_S9M1eXwjBw";
 
         try {
@@ -435,7 +432,7 @@ class LolApplicationTests {
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 
-                RankTypeDTO queueTypeDTO = new RankTypeDTO();
+                RankTypeFlex queueTypeDTO = new RankTypeFlex();
 
                 queueTypeDTO.setQueueType(jsonObject.get("queueType").toString());
                 queueTypeDTO.setTier(jsonObject.get("tier").toString());

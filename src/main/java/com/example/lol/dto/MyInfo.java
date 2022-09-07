@@ -4,24 +4,26 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.util.List;
 
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MatchUserInfoDTO {
-    private String summonerName;
-    private boolean win;
+public class MyInfo {
+    @Id
+    @Column(name ="my_info_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long myInfoId;
     private String championName;
-    private int champLevel;
-    private int kills;
-    private int deaths;
-    private int assists;
-    private int totalMinionsKilled;
-    private int totalDamageDealtToChampions;
+    @ElementCollection
     private List<String> items;
     private String primaryPerk;
     private String subPerk;
+    private int kills;
+    private int deaths;
+    private int assists;
     private String spell1Id;
     private String spell2Id;
 }
