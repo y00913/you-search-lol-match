@@ -4,6 +4,7 @@ import com.example.lol.dto.LeagueEntry;
 import com.example.lol.dto.Match;
 import com.example.lol.dto.MatchUserInfo;
 import com.example.lol.dto.Summoner;
+import com.example.lol.repository.*;
 import com.example.lol.service.IconService;
 import com.example.lol.service.SummonerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,21 @@ public class IndexController {
     @Autowired
     private IconService iconService;
 
+    @Autowired
+    private SummonerRepository summonerRepository;
+
+    @Autowired
+    private RankTypeFlexRepository rankTypeFlexRepository;
+
+    @Autowired
+    private RankTypeSoloRepository rankTypeSoloRepository;
+
+    @Autowired
+    private MatchRepository matchRepository;
+
+    @Autowired
+    private MyInfoRepository myInfoRepository;
+
     @GetMapping
     public String index() {
 
@@ -31,8 +47,7 @@ public class IndexController {
 
     @GetMapping("/search")
     public String getResult(String summonerName, Model model) {
-        String summonerNameRepl = summonerName.replaceAll(" ","%20");
-        Summoner summonerDTO = summonerService.callRiotAPISummonerByName(summonerNameRepl);
+        Summoner summonerDTO = summonerRepository.findByName(summonerName);
 
         if (summonerDTO.getName() != null) {
             model.addAttribute("summoner", summonerDTO);

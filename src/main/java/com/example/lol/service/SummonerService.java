@@ -46,9 +46,10 @@ public class SummonerService {
     @Value("${riotApiKey}")
     private String myKey;
 
-    public Summoner callRiotAPISummonerByName(String summonerName) {
+    public void callRiotAPISummonerByName(String summonerName) {
         Summoner summonerDTO = new Summoner();
-        String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerName;
+        String summonerNameRepl = summonerName.replaceAll(" ","%20");
+        String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerNameRepl;
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
@@ -76,10 +77,7 @@ public class SummonerService {
             }
         } catch (IOException | ParseException e) {
             e.printStackTrace();
-            return null;
         }
-
-        return summonerDTO;
     }
 
     public List<String> callMatchHistory(String puuid, int start) {
@@ -114,8 +112,16 @@ public class SummonerService {
         return result;
     }
 
-    public LeagueEntry callLeagueEntry(String id) {
-        LeagueEntry leagueEntryDTO = new LeagueEntry();
+    public LeagueEntry callLeagueEntry(String id){
+        LeagueEntry leagueEntry = new LeagueEntry();
+
+        leagueEntry.setRanked_Flex(rankTypeFlexRepository.findById(id));
+        leagueEntry.setRanked_Solo(rankTypeSoloRepository.findById(id));
+
+        return leagueEntry;
+    }
+
+    public void callRankTier(String id) {
         String url = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/" + id;
 
         try {
@@ -147,7 +153,6 @@ public class SummonerService {
                     rankTypeFlex.setUserWins(Integer.parseInt(jsonObject.get("wins").toString()));
                     rankTypeFlex.setUserLosses(Integer.parseInt(jsonObject.get("losses").toString()));
 
-                    leagueEntryDTO.setRanked_Flex(rankTypeFlex);
                     if(rankTypeFlexRepository.findById(id) == null){
                         rankTypeFlexRepository.save(rankTypeFlex);
                     }
@@ -161,7 +166,6 @@ public class SummonerService {
                     rankTypeSolo.setUserWins(Integer.parseInt(jsonObject.get("wins").toString()));
                     rankTypeSolo.setUserLosses(Integer.parseInt(jsonObject.get("losses").toString()));
 
-                    leagueEntryDTO.setRanked_Solo(rankTypeSolo);
                     if(rankTypeSoloRepository.findById(id) == null){
                         rankTypeSoloRepository.save(rankTypeSolo);
                     }
@@ -169,10 +173,7 @@ public class SummonerService {
             }
         } catch (ParseException e) {
             e.printStackTrace();
-            return null;
         }
-
-        return leagueEntryDTO;
     }
 
     public List<Match> callMatchAbout(List<String> matchHistory, String puuid) {
@@ -181,6 +182,7 @@ public class SummonerService {
         for (String matchId : matchHistory) {
             String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + myKey;
             Match matchDTO = new Match();
+            MyInfo myInfoDTO = new MyInfo();
 
             matchDTO.setPuuid(puuid);
             matchDTO.setMatchId(matchId);
@@ -205,7 +207,7 @@ public class SummonerService {
                     continue;
                 }
                 matchDTO.setQueueType(qt);
-                matchDTO.setEndTimeStamp(Long.parseLong(info.get("gameEndTimestamp").toString()));
+                matchDTO.setEndTimeStamp(Long.parseLong(info.get("gameEndTimestamp").toString()) / 1000);
 
                 long timestamp = (System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString())) / 1000;
                 if (timestamp < 60) {
@@ -221,6 +223,7 @@ public class SummonerService {
                     String endTime = Math.round(timestamp / 60 / 60 / 24) + "일 전";
                     matchDTO.setEndTime(endTime);
                 } else {
+
                     String endTime = Math.round(timestamp / 60 / 60 / 24 / 30) + "달 전";
                     matchDTO.setEndTime(endTime);
                 }
@@ -229,25 +232,26 @@ public class SummonerService {
                 matchDTO.setGameDurationMinutes(gameDuration / 60);
                 matchDTO.setGameDurationSeconds(gameDuration % 60);
 
-                MyInfo myInfoDTO = new MyInfo();
                 for (int i = 0; i < participants.size(); i++) {
                     JSONObject participant = (JSONObject) participants.get(i);
 
                     if (participant.get("puuid").toString().equalsIgnoreCase(puuid)) {
                         matchDTO.setWin((boolean) participant.get("win"));
-                        myInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
+                        myInfoDTO.setChampionName(participant.get("championName").toString());
 
-                        List<String> myItems = new ArrayList<>();
-                        for (int j = 0; j <= 6; j++) {
-                            myItems.add(iconService.callItemIcon(participant.get("item" + j).toString()));
-                        }
-                        myInfoDTO.setItems(myItems);
+                        myInfoDTO.setItem0(participant.get("item0").toString());
+                        myInfoDTO.setItem1(participant.get("item1").toString());
+                        myInfoDTO.setItem2(participant.get("item2").toString());
+                        myInfoDTO.setItem3(participant.get("item3").toString());
+                        myInfoDTO.setItem4(participant.get("item4").toString());
+                        myInfoDTO.setItem5(participant.get("item5").toString());
+                        myInfoDTO.setItem6(participant.get("item6").toString());
 
                         myInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
                         myInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
                         myInfoDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
-                        myInfoDTO.setSpell1Id(iconService.callSpellIcon(participant.get("summoner1Id").toString()));
-                        myInfoDTO.setSpell2Id(iconService.callSpellIcon(participant.get("summoner2Id").toString()));
+                        myInfoDTO.setSpell1Id(participant.get("summoner1Id").toString());
+                        myInfoDTO.setSpell2Id(participant.get("summoner2Id").toString());
 
                         JSONObject perks = (JSONObject) participant.get("perks");
                         JSONArray styles = (JSONArray) perks.get("styles");
@@ -256,24 +260,24 @@ public class SummonerService {
                         JSONArray primarySelections = (JSONArray) primaryStyle.get("selections");
                         JSONObject primarySelectionsNumber = (JSONObject) primarySelections.get(0);
 
-                        myInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
-                        myInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
+                        myInfoDTO.setPrimaryPerk(primarySelectionsNumber.get("perk").toString());
+                        myInfoDTO.setSubPerk(subStyle.get("style").toString());
                     }
                 }
 
                 matchDTO.setMyInfoDTO(myInfoDTO);
 
-                if(matchRepository.findByMatchId(matchId) == null){
-                    myInfoRepository.save(myInfoDTO);
-                    matchRepository.save(matchDTO);
-                }
+
             } catch (ParseException e) {
                 e.printStackTrace();
                 return null;
             }
+            if(matchRepository.findByMatchId(matchId) == null){
+                myInfoRepository.save(myInfoDTO);
+                matchRepository.save(matchDTO);
+            }
 
             matchDTOs.add(matchDTO);
-
         }
 
         return matchDTOs;

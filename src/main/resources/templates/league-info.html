@@ -23,6 +23,13 @@
                         </h2>
                     </td>
 
+                    <td>
+                        <div style="text-align: center">
+                            <button type="button" onclick="window.location.reload()"> 갱신
+                            </button>
+                        </div>
+                    </td>
+
                     <td style="padding-left: 150px; width: 100px">
                         <th:block th:if="${leagueEntry.Ranked_Solo != null}">
                             <p><img th:src="@{${leagueEntry.Ranked_Solo.userTierUrl}}" width="100"
@@ -94,5 +101,6 @@
 
     </table>
 </div>
+
 </body>
 </html>
