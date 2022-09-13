@@ -21,8 +21,24 @@ public class Match {
     private Long gameDurationSeconds;
     private boolean win;
     private Long endTimeStamp;
+    @Transient
     private String endTime;
-    @OneToOne
-    @JoinColumn(name = "my_info_id")
-    private MyInfo myInfoDTO;
+//    @OneToOne
+//    @JoinColumn(name = "my_info_id")
+//    private MyInfo myInfoDTO;
+    private String championName;
+    private String primaryPerk;
+    private String subPerk;
+    private int kills;
+    private int deaths;
+    private int assists;
+    private String spell1Id;
+    private String spell2Id;
+    private String item0;
+    private String item1;
+    private String item2;
+    private String item3;
+    private String item4;
+    private String item5;
+    private String item6;
 }

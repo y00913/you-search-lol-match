@@ -40,13 +40,10 @@ public class SummonerService {
     @Autowired
     MatchRepository matchRepository;
 
-    @Autowired
-    MyInfoRepository myInfoRepository;
-
     @Value("${riotApiKey}")
     private String myKey;
 
-    public void callRiotAPISummonerByName(String summonerName) {
+    public Summoner callRiotAPISummonerByName(String summonerName) {
         Summoner summonerDTO = new Summoner();
         String summonerNameRepl = summonerName.replaceAll(" ","%20");
         String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerNameRepl;
@@ -78,9 +75,11 @@ public class SummonerService {
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
+
+        return summonerDTO;
     }
 
-    public List<String> callMatchHistory(String puuid, int start) {
+    public List<String> callMatchHistory(String puuid, Long startTime) {
         List<String> result = new ArrayList();
         String url = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid;
 
@@ -88,8 +87,9 @@ public class SummonerService {
             WebClient webClient = WebClient.builder().baseUrl(url).build();
             List<String> body = webClient.get()
                     .uri(uriBuilder -> uriBuilder.path("/ids")
-                            .queryParam("start", start)
-                            .queryParam("count", 10)
+                            .queryParam("startTime", startTime)
+                            .queryParam("start", 0)
+                            .queryParam("count", 40)
                             .queryParam("api_key", myKey).build())
                     .retrieve()
                     .bodyToFlux(String.class)
@@ -176,13 +176,12 @@ public class SummonerService {
         }
     }
 
-    public List<Match> callMatchAbout(List<String> matchHistory, String puuid) {
+    public void callMatchAbout(List<String> matchHistory, String puuid) {
         List<Match> matchDTOs = new ArrayList<>();
 
         for (String matchId : matchHistory) {
             String url = "https://asia.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + myKey;
             Match matchDTO = new Match();
-            MyInfo myInfoDTO = new MyInfo();
 
             matchDTO.setPuuid(puuid);
             matchDTO.setMatchId(matchId);
@@ -209,25 +208,6 @@ public class SummonerService {
                 matchDTO.setQueueType(qt);
                 matchDTO.setEndTimeStamp(Long.parseLong(info.get("gameEndTimestamp").toString()) / 1000);
 
-                long timestamp = (System.currentTimeMillis() - Long.parseLong(info.get("gameEndTimestamp").toString())) / 1000;
-                if (timestamp < 60) {
-                    String endTime = Math.round(timestamp) + "초 전";
-                    matchDTO.setEndTime(endTime);
-                } else if (timestamp / 60 < 60) {
-                    String endTime = Math.round(timestamp / 60) + "분 전";
-                    matchDTO.setEndTime(endTime);
-                } else if (timestamp / 60 / 60 < 24) {
-                    String endTime = Math.round(timestamp / 60 / 60) + "시간 전";
-                    matchDTO.setEndTime(endTime);
-                } else if (timestamp / 60 / 60 / 24 < 30) {
-                    String endTime = Math.round(timestamp / 60 / 60 / 24) + "일 전";
-                    matchDTO.setEndTime(endTime);
-                } else {
-
-                    String endTime = Math.round(timestamp / 60 / 60 / 24 / 30) + "달 전";
-                    matchDTO.setEndTime(endTime);
-                }
-
                 Long gameDuration = Long.parseLong(info.get("gameDuration").toString());
                 matchDTO.setGameDurationMinutes(gameDuration / 60);
                 matchDTO.setGameDurationSeconds(gameDuration % 60);
@@ -237,21 +217,21 @@ public class SummonerService {
 
                     if (participant.get("puuid").toString().equalsIgnoreCase(puuid)) {
                         matchDTO.setWin((boolean) participant.get("win"));
-                        myInfoDTO.setChampionName(participant.get("championName").toString());
+                        matchDTO.setChampionName(participant.get("championName").toString());
 
-                        myInfoDTO.setItem0(participant.get("item0").toString());
-                        myInfoDTO.setItem1(participant.get("item1").toString());
-                        myInfoDTO.setItem2(participant.get("item2").toString());
-                        myInfoDTO.setItem3(participant.get("item3").toString());
-                        myInfoDTO.setItem4(participant.get("item4").toString());
-                        myInfoDTO.setItem5(participant.get("item5").toString());
-                        myInfoDTO.setItem6(participant.get("item6").toString());
+                        matchDTO.setItem0(participant.get("item0").toString());
+                        matchDTO.setItem1(participant.get("item1").toString());
+                        matchDTO.setItem2(participant.get("item2").toString());
+                        matchDTO.setItem3(participant.get("item3").toString());
+                        matchDTO.setItem4(participant.get("item4").toString());
+                        matchDTO.setItem5(participant.get("item5").toString());
+                        matchDTO.setItem6(participant.get("item6").toString());
 
-                        myInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
-                        myInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
-                        myInfoDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
-                        myInfoDTO.setSpell1Id(participant.get("summoner1Id").toString());
-                        myInfoDTO.setSpell2Id(participant.get("summoner2Id").toString());
+                        matchDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
+                        matchDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
+                        matchDTO.setAssists(Integer.parseInt(participant.get("assists").toString()));
+                        matchDTO.setSpell1Id(participant.get("summoner1Id").toString());
+                        matchDTO.setSpell2Id(participant.get("summoner2Id").toString());
 
                         JSONObject perks = (JSONObject) participant.get("perks");
                         JSONArray styles = (JSONArray) perks.get("styles");
@@ -260,27 +240,18 @@ public class SummonerService {
                         JSONArray primarySelections = (JSONArray) primaryStyle.get("selections");
                         JSONObject primarySelectionsNumber = (JSONObject) primarySelections.get(0);
 
-                        myInfoDTO.setPrimaryPerk(primarySelectionsNumber.get("perk").toString());
-                        myInfoDTO.setSubPerk(subStyle.get("style").toString());
+                        matchDTO.setPrimaryPerk(primarySelectionsNumber.get("perk").toString());
+                        matchDTO.setSubPerk(subStyle.get("style").toString());
                     }
                 }
-
-                matchDTO.setMyInfoDTO(myInfoDTO);
-
-
             } catch (ParseException e) {
                 e.printStackTrace();
-                return null;
-            }
-            if(matchRepository.findByMatchId(matchId) == null){
-                myInfoRepository.save(myInfoDTO);
-                matchRepository.save(matchDTO);
             }
 
             matchDTOs.add(matchDTO);
         }
 
-        return matchDTOs;
+        matchRepository.saveAll(matchDTOs);
     }
 
     public List<MatchUserInfo> callDetailMatch(String matchId) {

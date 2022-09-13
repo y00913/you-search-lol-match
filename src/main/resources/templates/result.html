@@ -27,8 +27,8 @@
                 <img src="/static/img/loading.gif">
             </div>
 
-            <div>
-                <button type="button" id="resultButton" th:onclick="callPastMatch([[${summoner.puuid}]])"
+            <div id="resultButton">
+                <button type="button" th:onclick="callPastMatch([[${summoner.puuid}]])"
                         style="margin-top: 30px; background-color: rgba(0,0,0,0); cursor:pointer; border: none;">
                     <img src="https://cdn-icons-png.flaticon.com/512/43/43869.png"
                          style="max-width: 30px; max-height: 30px;" alt="더 보기">
@@ -57,6 +57,10 @@
 
     /*<![CDATA[*/
     $(function () {
+        if(start > 3){
+            $('#resultButton').hide();
+        }
+
         $('#loading').hide();
 
         if ([[${summoner}]] != null) {
@@ -79,11 +83,10 @@
                 },
             }).done(function (result) {
                 $('#match-table').append(result);
-                start = start + 10;
+                start = start + 1;
             });
         }
     })
-
     /*]]*/
 
     function callPastMatch(puuid) {
@@ -100,7 +103,7 @@
             },
         }).done(function (result) {
             $('#match-table').append(result);
-            start = start + 10;
+            start = start + 1;
         });
     }
 </script>

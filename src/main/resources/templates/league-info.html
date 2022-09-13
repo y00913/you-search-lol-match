@@ -23,10 +23,22 @@
                         </h2>
                     </td>
 
-                    <td>
+                    <td style="width: 60px">
                         <div style="text-align: center">
-                            <button type="button" onclick="window.location.reload()"> 갱신
-                            </button>
+                            <div id="renewal">
+                                <button type="button" th:onclick="callRenewal([[${name}]])"
+                                        style="background-color: #76B8E0; color: #F1F1F1; border: none; border-radius: 10px;
+                                        width: 60px; height: 30px; display: flex; align-items:center; justify-content: center; cursor:pointer;">
+                                    <p style="font-weight: bold; font-size: 16px;">
+                                        갱신
+                                    </p>
+                                </button>
+                            </div>
+
+                            <div id="loading_renewal"
+                                 style="display: none;">
+                                <img src="/static/img/loading.gif" style="width: 50px; height: 50px;">
+                            </div>
                         </div>
                     </td>
 
@@ -101,6 +113,25 @@
 
     </table>
 </div>
+
+<script>
+    function callRenewal(summonerName) {
+        $.ajax({
+            url: '/renewal/' + summonerName,
+            type: 'GET',
+            beforeSend: function () {
+                $('#loading_renewal').show();
+                $('#renewal').hide();
+            },
+            complete: function () {
+                $('#loading_renewal').hide();
+                $('#renewal').show();
+            },
+        }).done(function (result) {
+            document.location.reload();
+        });
+    }
+</script>
 
 </body>
 </html>
