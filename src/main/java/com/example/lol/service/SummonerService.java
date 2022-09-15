@@ -15,6 +15,7 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -29,21 +30,21 @@ public class SummonerService {
     private IconService iconService;
 
     @Autowired
-    SummonerRepository summonerRepository;
+    private SummonerRepository summonerRepository;
 
     @Autowired
-    RankTypeFlexRepository rankTypeFlexRepository;
+    private RankTypeFlexRepository rankTypeFlexRepository;
 
     @Autowired
-    RankTypeSoloRepository rankTypeSoloRepository;
+    private RankTypeSoloRepository rankTypeSoloRepository;
 
     @Autowired
-    MatchRepository matchRepository;
+    private MatchRepository matchRepository;
 
     @Value("${riotApiKey}")
     private String myKey;
 
-    public Summoner callRiotAPISummonerByName(String summonerName) {
+    public Summoner callRiotAPISummonerByName(String summonerName, boolean check) {
         Summoner summonerDTO = new Summoner();
         String summonerNameRepl = summonerName.replaceAll(" ","%20");
         String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerNameRepl;
@@ -66,7 +67,7 @@ public class SummonerService {
                 summonerDTO.setProfileIcon(jsonObject.get("profileIconId").toString());
                 summonerDTO.setSummonerLevel(Long.parseLong(jsonObject.get("summonerLevel").toString()));
 
-                if(summonerRepository.findByPuuid(summonerDTO.getPuuid()) == null) {
+                if(summonerRepository.findByPuuid(summonerDTO.getPuuid()) == null && check == true) {
                     summonerRepository.save(summonerDTO);
                 }
             } else {
@@ -79,6 +80,8 @@ public class SummonerService {
         return summonerDTO;
     }
 
+
+
     public List<String> callMatchHistory(String puuid, Long startTime) {
         List<String> result = new ArrayList();
         String url = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid;
@@ -89,7 +92,7 @@ public class SummonerService {
                     .uri(uriBuilder -> uriBuilder.path("/ids")
                             .queryParam("startTime", startTime)
                             .queryParam("start", 0)
-                            .queryParam("count", 40)
+                            .queryParam("count", 30)
                             .queryParam("api_key", myKey).build())
                     .retrieve()
                     .bodyToFlux(String.class)

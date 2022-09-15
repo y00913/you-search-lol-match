@@ -40,7 +40,7 @@ public class IndexController {
 
     @GetMapping("/renewal/{summonerName}")
     public String renewal(@PathVariable String summonerName){
-        Summoner summoner = summonerService.callRiotAPISummonerByName(summonerName);
+        Summoner summoner = summonerService.callRiotAPISummonerByName(summonerName, true);
         summonerService.callRankTier(summoner.getId());
         Optional<StartTimeMapping> startTime = matchRepository.findTop1ByPuuid(summoner.getPuuid(), Sort.by(Sort.Direction.DESC, "endTimeStamp"));
         List<String> matchHistory = new ArrayList<>();
@@ -60,10 +60,12 @@ public class IndexController {
 
         if (summonerDTO.isPresent()) {
             model.addAttribute("summoner", summonerDTO.get());
+            model.addAttribute("check", true);
         } else {
-            Summoner tmp = summonerService.callRiotAPISummonerByName(summonerName);
+            Summoner tmp = summonerService.callRiotAPISummonerByName(summonerName, false);
             if(tmp.getName() != null){
                 model.addAttribute("summoner", tmp);
+                model.addAttribute("check", false);
             }
         }
 

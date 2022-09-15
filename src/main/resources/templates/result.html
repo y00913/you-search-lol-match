@@ -35,6 +35,12 @@
                 </button>
             </div>
 
+            <div th:if="${check == false}">
+                <h2>
+                    갱신이 필요합니다.
+                </h2>
+            </div>
+
         </th:block>
 
         <th:block th:if="${summoner == null}">
@@ -57,10 +63,6 @@
 
     /*<![CDATA[*/
     $(function () {
-        if(start > 3){
-            $('#resultButton').hide();
-        }
-
         $('#loading').hide();
 
         if ([[${summoner}]] != null) {
@@ -80,6 +82,9 @@
                 complete: function () {
                     $('#loading').hide();
                     $('#resultButton').show();
+                    if([[${check}]] == false){
+                        $('#resultButton').hide();
+                    }
                 },
             }).done(function (result) {
                 $('#match-table').append(result);
@@ -100,6 +105,9 @@
             complete: function () {
                 $('#loading').hide();
                 $('#resultButton').show();
+                if(start == 3){
+                    $('#resultButton').hide();
+                }
             },
         }).done(function (result) {
             $('#match-table').append(result);

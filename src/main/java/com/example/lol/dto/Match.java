@@ -23,9 +23,6 @@ public class Match {
     private Long endTimeStamp;
     @Transient
     private String endTime;
-//    @OneToOne
-//    @JoinColumn(name = "my_info_id")
-//    private MyInfo myInfoDTO;
     private String championName;
     private String primaryPerk;
     private String subPerk;

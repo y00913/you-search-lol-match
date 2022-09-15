@@ -1,16 +1,11 @@
 package com.example.lol.controller;
 
-import com.example.lol.dto.Match;
-import com.example.lol.dto.StartTimeMapping;
 import com.example.lol.dto.Summoner;
 import com.example.lol.repository.*;
 import com.example.lol.service.SummonerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
