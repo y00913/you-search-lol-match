@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,6 +39,7 @@ public class IndexController {
         return "index";
     }
 
+    @Transactional
     @GetMapping("/renewal/{summonerName}")
     public String renewal(@PathVariable String summonerName){
         Summoner summoner = summonerService.callRiotAPISummonerByName(summonerName, true);
@@ -74,6 +76,7 @@ public class IndexController {
         return "result";
     }
 
+    @Transactional
     @GetMapping("/{id}/{name}/{summonerLevel}/{profileIcon}")
     public String callLeagueInfo(@PathVariable String id, @PathVariable String name, @PathVariable String summonerLevel, @PathVariable String profileIcon, Model model){
         LeagueEntry leagueEntry = summonerService.callLeagueEntry(id);
