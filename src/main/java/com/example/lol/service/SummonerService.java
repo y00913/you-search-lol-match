@@ -15,7 +15,6 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -33,10 +32,7 @@ public class SummonerService {
     private SummonerRepository summonerRepository;
 
     @Autowired
-    private RankTypeFlexRepository rankTypeFlexRepository;
-
-    @Autowired
-    private RankTypeSoloRepository rankTypeSoloRepository;
+    private RankTypeRepository rankTypeRepository;
 
     @Autowired
     private MatchRepository matchRepository;
@@ -44,7 +40,7 @@ public class SummonerService {
     @Value("${riotApiKey}")
     private String myKey;
 
-    public Summoner callRiotAPISummonerByName(String summonerName, boolean check) {
+    public Summoner callRiotAPISummonerByName(String summonerName) {
         Summoner summonerDTO = new Summoner();
         String summonerNameRepl = summonerName.replaceAll(" ","%20");
         String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerNameRepl;
@@ -67,9 +63,7 @@ public class SummonerService {
                 summonerDTO.setProfileIcon(jsonObject.get("profileIconId").toString());
                 summonerDTO.setSummonerLevel(Long.parseLong(jsonObject.get("summonerLevel").toString()));
 
-                if(summonerRepository.findByPuuid(summonerDTO.getPuuid()) == null && check == true) {
-                    summonerRepository.save(summonerDTO);
-                }
+                summonerRepository.save(summonerDTO);
             } else {
                 System.out.println("error : " + response.getStatusLine().getStatusCode());
             }
@@ -115,17 +109,9 @@ public class SummonerService {
         return result;
     }
 
-    public LeagueEntry callLeagueEntry(String id){
-        LeagueEntry leagueEntry = new LeagueEntry();
-
-        leagueEntry.setRanked_Flex(rankTypeFlexRepository.findById(id));
-        leagueEntry.setRanked_Solo(rankTypeSoloRepository.findById(id));
-
-        return leagueEntry;
-    }
-
-    public void callRankTier(String id) {
+    public RankType callRankTier(String id) {
         String url = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/" + id;
+        RankType rankType = new RankType();
 
         try {
             WebClient webClient = WebClient.builder().baseUrl(url).build();
@@ -140,43 +126,32 @@ public class SummonerService {
             JSONParser jsonParser = new JSONParser();
             JSONArray jsonArray = (JSONArray) jsonParser.parse(body.get(0));
 
+            rankType.setId(id);
+
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 
-                RankTypeFlex rankTypeFlex = new RankTypeFlex();
-                RankTypeSolo rankTypeSolo = new RankTypeSolo();
-
                 if (jsonObject.get("queueType").toString().equals("RANKED_FLEX_SR")) {
-                    rankTypeFlex.setId(id);
-                    rankTypeFlex.setQueueType(jsonObject.get("queueType").toString());
-                    rankTypeFlex.setUserTier(jsonObject.get("tier").toString());
-                    rankTypeFlex.setUserTierUrl(iconService.callTierIcon(jsonObject.get("tier").toString()));
-                    rankTypeFlex.setUserRank(jsonObject.get("rank").toString());
-                    rankTypeFlex.setLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
-                    rankTypeFlex.setUserWins(Integer.parseInt(jsonObject.get("wins").toString()));
-                    rankTypeFlex.setUserLosses(Integer.parseInt(jsonObject.get("losses").toString()));
-
-                    if(rankTypeFlexRepository.findById(id) == null){
-                        rankTypeFlexRepository.save(rankTypeFlex);
-                    }
+                    rankType.setFlexUserTier(jsonObject.get("tier").toString());
+                    rankType.setFlexUserRank(jsonObject.get("rank").toString());
+                    rankType.setFlexLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
+                    rankType.setFlexUserWins(Integer.parseInt(jsonObject.get("wins").toString()));
+                    rankType.setFlexUserLosses(Integer.parseInt(jsonObject.get("losses").toString()));
                 } else {
-                    rankTypeSolo.setId(id);
-                    rankTypeSolo.setQueueType(jsonObject.get("queueType").toString());
-                    rankTypeSolo.setUserTier(jsonObject.get("tier").toString());
-                    rankTypeSolo.setUserTierUrl(iconService.callTierIcon(jsonObject.get("tier").toString()));
-                    rankTypeSolo.setUserRank(jsonObject.get("rank").toString());
-                    rankTypeSolo.setLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
-                    rankTypeSolo.setUserWins(Integer.parseInt(jsonObject.get("wins").toString()));
-                    rankTypeSolo.setUserLosses(Integer.parseInt(jsonObject.get("losses").toString()));
-
-                    if(rankTypeSoloRepository.findById(id) == null){
-                        rankTypeSoloRepository.save(rankTypeSolo);
-                    }
+                    rankType.setSoloUserTier(jsonObject.get("tier").toString());
+                    rankType.setSoloUserRank(jsonObject.get("rank").toString());
+                    rankType.setSoloLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
+                    rankType.setSoloUserWins(Integer.parseInt(jsonObject.get("wins").toString()));
+                    rankType.setSoloUserLosses(Integer.parseInt(jsonObject.get("losses").toString()));
                 }
             }
+
+            rankTypeRepository.save(rankType);
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+        return rankType;
     }
 
     public void callMatchAbout(List<String> matchHistory, String puuid) {

@@ -43,8 +43,8 @@
                     </td>
 
                     <td style="padding-left: 150px; width: 100px">
-                        <th:block th:if="${leagueEntry.Ranked_Solo != null}">
-                            <p><img th:src="@{${leagueEntry.Ranked_Solo.userTierUrl}}" width="100"
+                        <th:block th:if="${!#strings.isEmpty(rankType?.soloUserTier)}">
+                            <p><img th:src="@{${soloTierImg}}" width="100"
                                     style="border-radius: 30px"></p>
                         </th:block>
                     </td>
@@ -54,30 +54,30 @@
                             <span>솔로 랭크</span>
                         </div>
 
-                        <th:block th:if="${leagueEntry.Ranked_Solo != null}">
+                        <th:block th:if="${!#strings.isEmpty(rankType?.soloUserTier)}">
                             <div style="margin-bottom: 0; font-size: 1.5em; font-weight: bold">
-                                <span th:text="${leagueEntry.Ranked_Solo.userTier}"></span>
-                                <span th:text="${leagueEntry.Ranked_Solo.userRank}"></span>
+                                <span th:text="${rankType.soloUserTier}"></span>
+                                <span th:text="${rankType.soloUserRank}"></span>
                             </div>
                             <div style="margin-bottom: 0; font-weight: bold">
-                                <span th:text="${leagueEntry.Ranked_Solo.leaguePoints} + lp"></span>
+                                <span th:text="${rankType.soloLeaguePoints} + lp"></span>
                             </div>
 
                             <div style="margin-bottom: 0; font-weight: bold">
-                                <span th:text="${leagueEntry.Ranked_Solo.userWins}"></span>승
-                                <span th:text="${leagueEntry.Ranked_Solo.userLosses}"></span>패
+                                <span th:text="${rankType.soloUserWins}"></span>승
+                                <span th:text="${rankType.soloUserLosses}"></span>패
                             </div>
 
 
                         </th:block>
-                        <th:blcok th:if="${leagueEntry.Ranked_Solo == null}">
+                        <th:blcok th:if="${#strings.isEmpty(rankType?.soloUserTier)}">
                             <h2>Unranked</h2>
                         </th:blcok>
                     </td>
 
                     <td style="padding-left: 10px; width: 100px">
-                        <th:block th:if="${leagueEntry.Ranked_Flex != null}">
-                            <p><img th:src="@{${leagueEntry.Ranked_Flex.userTierUrl}}" width="100"
+                        <th:block th:if="${!#strings.isEmpty(rankType?.flexUserTier)}">
+                            <p><img th:src="@{${flexTierImg}}" width="100"
                                     style="border-radius: 30px"></p>
                         </th:block>
                     </td>
@@ -87,23 +87,23 @@
                             <span>자유 랭크</span>
                         </div>
 
-                        <th:block th:if="${leagueEntry.Ranked_Flex != null}">
+                        <th:block th:if="${!#strings.isEmpty(rankType?.flexUserTier)}">
 
                             <div style="margin-bottom: 0; font-size: 1.5em; font-weight: bold">
-                                <span th:text="${leagueEntry.Ranked_Flex.userTier}"></span>
-                                <span th:text="${leagueEntry.Ranked_Flex.userRank}"></span>
+                                <span th:text="${rankType.flexUserTier}"></span>
+                                <span th:text="${rankType.flexUserRank}"></span>
                             </div>
 
                             <div style="margin-bottom: 0; font-weight: bold">
-                                <span th:text="${leagueEntry.Ranked_Flex.leaguePoints} + lp"></span>
+                                <span th:text="${rankType.flexLeaguePoints} + lp"></span>
                             </div>
 
                             <div style="margin-bottom: 0; font-weight: bold">
-                                <span th:text="${leagueEntry.Ranked_Flex.userWins}"></span>승
-                                <span th:text="${leagueEntry.Ranked_Flex.userLosses}"></span>패
+                                <span th:text="${rankType.flexUserWins}"></span>승
+                                <span th:text="${rankType.flexUserLosses}"></span>패
                             </div>
                         </th:block>
-                        <th:blcok th:if="${leagueEntry.Ranked_Flex == null}">
+                        <th:blcok th:if="${#strings.isEmpty(rankType?.flexUserTier)}">
                             <h2>Unranked</h2>
                         </th:blcok>
                     </td>

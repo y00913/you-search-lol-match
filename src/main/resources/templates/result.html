@@ -35,10 +35,13 @@
                 </button>
             </div>
 
-            <div th:if="${check == false}">
-                <h2>
+            <div th:if="${check == false}" style="font-size: 1.5em; font-weight: bold;">
+                <p>
                     갱신이 필요합니다.
-                </h2>
+                </p>
+                <p>
+                    갱신 시 10초가량 소모됩니다.
+                </p>
             </div>
 
         </th:block>

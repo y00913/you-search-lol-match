@@ -33,6 +33,9 @@ public class IndexController {
     @Autowired
     private MatchRepository matchRepository;
 
+    @Autowired
+    private RankTypeRepository rankTypeRepository;
+
     @GetMapping
     public String index() {
 
@@ -42,7 +45,7 @@ public class IndexController {
     @Transactional
     @GetMapping("/renewal/{summonerName}")
     public String renewal(@PathVariable String summonerName){
-        Summoner summoner = summonerService.callRiotAPISummonerByName(summonerName, true);
+        Summoner summoner = summonerService.callRiotAPISummonerByName(summonerName);
         summonerService.callRankTier(summoner.getId());
         Optional<StartTimeMapping> startTime = matchRepository.findTop1ByPuuid(summoner.getPuuid(), Sort.by(Sort.Direction.DESC, "endTimeStamp"));
         List<String> matchHistory = new ArrayList<>();
@@ -59,16 +62,24 @@ public class IndexController {
     @GetMapping("/search")
     public String getResult(String summonerName, Model model) {
         Optional<Summoner> summonerDTO = summonerRepository.findByName(summonerName);
+        String puuid;
 
         if (summonerDTO.isPresent()) {
             model.addAttribute("summoner", summonerDTO.get());
-            model.addAttribute("check", true);
+            puuid = summonerDTO.get().getPuuid();
         } else {
-            Summoner tmp = summonerService.callRiotAPISummonerByName(summonerName, false);
+            Summoner tmp = summonerService.callRiotAPISummonerByName(summonerName);
+            puuid = tmp.getPuuid();
             if(tmp.getName() != null){
                 model.addAttribute("summoner", tmp);
                 model.addAttribute("check", false);
             }
+        }
+
+        if(matchRepository.findByPuuid(puuid).isEmpty()){
+            model.addAttribute("check", false);
+        } else {
+            model.addAttribute("check", true);
         }
 
         System.out.println(summonerDTO);
@@ -79,9 +90,30 @@ public class IndexController {
     @Transactional
     @GetMapping("/{id}/{name}/{summonerLevel}/{profileIcon}")
     public String callLeagueInfo(@PathVariable String id, @PathVariable String name, @PathVariable String summonerLevel, @PathVariable String profileIcon, Model model){
-        LeagueEntry leagueEntry = summonerService.callLeagueEntry(id);
+        Optional<RankType> rankType = rankTypeRepository.findById(id);
 
-        model.addAttribute("leagueEntry", leagueEntry);
+        if(rankType.isPresent()){
+            if(rankType.get().getFlexUserTier() != null){
+                model.addAttribute("flexTierImg", iconService.callTierIcon(rankType.get().getFlexUserTier()));
+            }
+            if(rankType.get().getSoloUserTier() != null){
+                model.addAttribute("soloTierImg", iconService.callTierIcon(rankType.get().getSoloUserTier()));
+            }
+
+            model.addAttribute("rankType", rankType.get());
+        } else {
+            RankType rankType1 = summonerService.callRankTier(id);
+
+            if(rankType1.getFlexUserTier() != null){
+                model.addAttribute("flexTierImg", iconService.callTierIcon(rankType1.getFlexUserTier()));
+            }
+            if(rankType1.getSoloUserTier() != null){
+                model.addAttribute("soloTierImg", iconService.callTierIcon(rankType1.getSoloUserTier()));
+            }
+
+            model.addAttribute("rankType", rankType1);
+        }
+
         model.addAttribute("name", name);
         model.addAttribute("summonerLevel", summonerLevel);
         model.addAttribute("profileIcon", iconService.callProfileIcon(profileIcon));
