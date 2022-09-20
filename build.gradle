@@ -23,7 +23,6 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation 'org.apache.httpcomponents:httpclient:4.5'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     implementation 'org.apache.httpcomponents:httpclient:4.5'

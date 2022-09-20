@@ -9,11 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,23 +38,6 @@ public class IndexController {
     public String index() {
 
         return "index";
-    }
-
-    @Transactional
-    @GetMapping("/renewal/{summonerName}")
-    public String renewal(@PathVariable String summonerName){
-        Summoner summoner = summonerService.callRiotAPISummonerByName(summonerName);
-        summonerService.callRankTier(summoner.getId());
-        Optional<StartTimeMapping> startTime = matchRepository.findTop1ByPuuid(summoner.getPuuid(), Sort.by(Sort.Direction.DESC, "endTimeStamp"));
-        List<String> matchHistory = new ArrayList<>();
-        if(startTime.isPresent()) {
-            matchHistory = summonerService.callMatchHistory(summoner.getPuuid(), startTime.get().getEndTimeStamp() + 10);
-        } else {
-            matchHistory = summonerService.callMatchHistory(summoner.getPuuid(), 0L);
-        }
-        summonerService.callMatchAbout(matchHistory, summoner.getPuuid());
-
-        return "result";
     }
 
     @GetMapping("/search")
@@ -86,7 +67,6 @@ public class IndexController {
         return "result";
     }
 
-    @Transactional
     @GetMapping("/{id}/{name}/{summonerLevel}/{profileIcon}")
     public String callLeagueInfo(@PathVariable String id, @PathVariable String name, @PathVariable String summonerLevel, @PathVariable String profileIcon, Model model){
         Optional<RankType> rankType = rankTypeRepository.findById(id);

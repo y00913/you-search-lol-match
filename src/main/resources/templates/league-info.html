@@ -117,7 +117,7 @@
 <script>
     function callRenewal(summonerName) {
         $.ajax({
-            url: '/renewal/' + summonerName,
+            url: '/api/renewal/' + summonerName,
             type: 'GET',
             beforeSend: function () {
                 $('#loading_renewal').show();
