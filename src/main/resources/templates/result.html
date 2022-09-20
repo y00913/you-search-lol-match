@@ -22,6 +22,9 @@
                 </table>
             </div>
 
+            <div id="end">
+                <p style="font-weight: bold;">기록된 전적이 없습니다.</p>
+            </div>
 
             <div id="loading" style="margin-top: 25px">
                 <img src="/static/img/loading.gif">
@@ -57,7 +60,7 @@
 
 <footer style="bottom: 0; margin-top: 100px; position: relative; text-align: center; font-weight: bold">
     <p>
-        made by <a th:href="@{https://github.com/y00913}" target="_blank" style="text-decoration: none;">y00913</a>
+        made by <a th:href="@{https://velog.io/@y00913}" target="_blank" style="text-decoration: none;">y00913</a>
     </p>
 </footer>
 
@@ -67,6 +70,7 @@
     /*<![CDATA[*/
     $(function () {
         $('#loading').hide();
+        $('#end').hide();
 
         if ([[${summoner}]] != null) {
             $.ajax({
@@ -105,11 +109,12 @@
             },
             url: '/' + puuid + '/' + start,
             type: 'GET',
-            complete: function () {
+            complete: function (result) {
                 $('#loading').hide();
                 $('#resultButton').show();
-                if(start == 3){
+                if(result.responseText == "<body>\r\n\r\n</body>"){
                     $('#resultButton').hide();
+                    $('#end').show();
                 }
             },
         }).done(function (result) {

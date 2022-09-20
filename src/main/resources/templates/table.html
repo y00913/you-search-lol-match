@@ -4,33 +4,33 @@
     <div th:replace="index :: fragment-head"></div>
 </head>
 <body>
+<th:block th:if="${!#lists.isEmpty(matches)}">
 
-<style>
-    .td_style {
-        text-align: center;
-        padding: 20px 20px 20px 20px;
-        border-radius: 15px;
-        width: 700px;
-    }
+    <style>
+        .td_style {
+            text-align: center;
+            padding: 20px 20px 20px 20px;
+            border-radius: 15px;
+            width: 700px;
+        }
 
-    .show {
-        cursor: pointer;
-        border: none;
-        width: 21px;
-        height: 21px;
-    }
+        .show {
+            cursor: pointer;
+            border: none;
+            width: 21px;
+            height: 21px;
+        }
 
-    .hide {
-        display: none;
-        cursor: pointer;
-        border: none;
-        width: 21px;
-        height: 21px;
-    }
-</style>
+        .hide {
+            display: none;
+            cursor: pointer;
+            border: none;
+            width: 21px;
+            height: 21px;
+        }
+    </style>
 
-<div>
-    <th:block th:if="${!#lists.isEmpty(matches)}">
+    <div>
         <table align="center">
             <tr th:each="match: ${matches}">
                 <td class="td_style"
@@ -131,39 +131,39 @@
                 </td>
             </tr>
         </table>
-    </th:block>
-</div>
+    </div>
 
-<script>
-    function callDetailMatch(matchId) {
-        $.ajax({
-            url: '/detail/' + matchId,
-            type: 'GET',
-            beforeSend: function () {
-                $('#loading' + matchId).show();
-                $('#call' + matchId).hide();
-                $('#showDetail' + matchId).hide();
-            },
-            complete: function () {
-                $('#loading' + matchId).hide();
-                $('#call' + matchId).hide();
-                $('#showDetail' + matchId).show();
-            },
-        }).done(function (result) {
-            $('#detail' + matchId).replaceWith(result);
-        });
-    }
-
-    function showDetail(matchId) {
-        if ($('#showD' + matchId).is(":visible")) {
-            $('#showD' + matchId).hide();
-            $('#showButton' + matchId).attr("src", "/static/img/down.png");
-        } else {
-            $('#showD' + matchId).show();
-            $('#showButton' + matchId).attr("src", "/static/img/up.png");
+    <script>
+        function callDetailMatch(matchId) {
+            $.ajax({
+                url: '/detail/' + matchId,
+                type: 'GET',
+                beforeSend: function () {
+                    $('#loading' + matchId).show();
+                    $('#call' + matchId).hide();
+                    $('#showDetail' + matchId).hide();
+                },
+                complete: function () {
+                    $('#loading' + matchId).hide();
+                    $('#call' + matchId).hide();
+                    $('#showDetail' + matchId).show();
+                },
+            }).done(function (result) {
+                $('#detail' + matchId).replaceWith(result);
+            });
         }
-    }
-</script>
 
+        function showDetail(matchId) {
+            if ($('#showD' + matchId).is(":visible")) {
+                $('#showD' + matchId).hide();
+                $('#showButton' + matchId).attr("src", "/static/img/down.png");
+            } else {
+                $('#showD' + matchId).show();
+                $('#showButton' + matchId).attr("src", "/static/img/up.png");
+            }
+        }
+    </script>
+
+</th:block>
 </body>
 </html>

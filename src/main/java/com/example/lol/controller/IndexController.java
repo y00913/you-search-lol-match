@@ -62,17 +62,16 @@ public class IndexController {
     @GetMapping("/search")
     public String getResult(String summonerName, Model model) {
         Optional<Summoner> summonerDTO = summonerRepository.findByName(summonerName);
-        String puuid;
+        String puuid = "";
 
         if (summonerDTO.isPresent()) {
             model.addAttribute("summoner", summonerDTO.get());
             puuid = summonerDTO.get().getPuuid();
         } else {
             Summoner tmp = summonerService.callRiotAPISummonerByName(summonerName);
-            puuid = tmp.getPuuid();
             if(tmp.getName() != null){
+                puuid = tmp.getPuuid();
                 model.addAttribute("summoner", tmp);
-                model.addAttribute("check", false);
             }
         }
 
@@ -123,8 +122,6 @@ public class IndexController {
 
     @GetMapping("/{puuid}/{start}")
     public String callMatchTable(@PathVariable String puuid, @PathVariable int start, Model model) {
-//        List<String> matchHistory = summonerService.callMatchHistory(puuid, start);
-//        List<Match> matchDTOs = summonerService.callMatchAbout(matchHistory, puuid);
         Page<Match> matchDTOs = matchRepository.findByPuuid(PageRequest.of(start,10, Sort.Direction.DESC, "endTimeStamp"), puuid);
         for(Match match : matchDTOs){
             Match tmp = match;
@@ -158,7 +155,7 @@ public class IndexController {
             tmp.setEndTime(endTime);
         }
 
-        model.addAttribute("matches", matchDTOs);
+        model.addAttribute("matches", matchDTOs.getContent());
 
         return "table :: body";
     }
