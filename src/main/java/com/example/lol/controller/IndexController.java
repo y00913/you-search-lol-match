@@ -149,4 +149,8 @@ public class IndexController {
         return "detail-table :: body";
     }
 
+    @GetMapping("/riot.txt")
+    public String callRiotText(Model model){
+        return "riot.txt";
+    }
 }
