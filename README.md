@@ -13,7 +13,7 @@ https://yose.ml
 - Riot api
 - Thymeleaf
 - jQuery
-- JPA
+- Spring Data JPA
 - MySQL
 
 
