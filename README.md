@@ -13,6 +13,8 @@ https://yose.ml
 - Riot api
 - Thymeleaf
 - jQuery
+- JPA
+- MySQL
 
 
 # 화면 구성
