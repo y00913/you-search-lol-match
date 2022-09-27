@@ -86,7 +86,7 @@ public class SummonerService {
                     .uri(uriBuilder -> uriBuilder.path("/ids")
                             .queryParam("startTime", startTime)
                             .queryParam("start", 0)
-                            .queryParam("count", 40)
+                            .queryParam("count", 30)
                             .queryParam("api_key", myKey).build())
                     .retrieve()
                     .bodyToFlux(String.class)
