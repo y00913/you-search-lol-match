@@ -5,7 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 riotApiKey.properties
-application.properties
+application-sql.properties
 
 ### STS ###
 .apt_generated
