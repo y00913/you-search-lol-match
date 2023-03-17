@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 @PropertySource(value = "classpath:riotApiKey.properties")
 public class SummonerService {
+    
     @Autowired
     private IconService iconService;
 
