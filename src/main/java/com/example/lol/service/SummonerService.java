@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class SummonerService {
     @Value("${riotApiKey}")
     private String myKey;
 
+    @Transactional
     public Summoner callRiotAPISummonerByName(String summonerName) {
         Summoner summonerDTO = new Summoner();
         String summonerNameRepl = summonerName.replaceAll(" ","%20");
@@ -75,8 +77,6 @@ public class SummonerService {
         return summonerDTO;
     }
 
-
-
     public List<String> callMatchHistory(String puuid, Long startTime) {
         List<String> result = new ArrayList();
         String url = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid;
@@ -110,6 +110,7 @@ public class SummonerService {
         return result;
     }
 
+    @Transactional
     public RankType callRankTier(String id) {
         String url = "https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/" + id;
         RankType rankType = new RankType();
@@ -155,6 +156,7 @@ public class SummonerService {
         return rankType;
     }
 
+    @Transactional
     public void callMatchAbout(List<String> matchHistory, String puuid) {
         List<Match> matchDTOs = new ArrayList<>();
 
