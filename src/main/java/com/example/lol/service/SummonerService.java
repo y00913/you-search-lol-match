@@ -139,7 +139,7 @@ public class SummonerService {
                     rankType.setFlexLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
                     rankType.setFlexUserWins(Integer.parseInt(jsonObject.get("wins").toString()));
                     rankType.setFlexUserLosses(Integer.parseInt(jsonObject.get("losses").toString()));
-                } else {
+                } else if (jsonObject.get("queueType").toString().equals("RANKED_SOLO_5x5")) {
                     rankType.setSoloUserTier(jsonObject.get("tier").toString());
                     rankType.setSoloUserRank(jsonObject.get("rank").toString());
                     rankType.setSoloLeaguePoints(Integer.parseInt(jsonObject.get("leaguePoints").toString()));
@@ -324,6 +324,8 @@ public class SummonerService {
             result = "돌격! 넥서스";
         } else if (queueId.equals("1400")) {
             result = "궁극기 주문서";
+        } else if (queueId.equals("1700")) {
+            result = "아레나";
         } else {
             result = "기타";
         }

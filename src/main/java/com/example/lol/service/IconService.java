@@ -48,11 +48,19 @@ public class IconService {
     public String callPrimaryPerkIcon(String perk) {
         String url = "https://opgg-static.akamaized.net/images/lol/perk/" + perk + ".png?image=q_auto,f_webp,w_auto&v=1660789334950";
 
+        if(perk.equals("0")) {
+            url = "";
+        }
+
         return url;
     }
 
     public String callSubPerkIcon(String perk) {
         String url = "https://opgg-static.akamaized.net/images/lol/perkStyle/" + perk + ".png?image=q_auto,f_webp,w_auto&v=1660789334950";
+
+        if(perk.equals("0")) {
+            url = "";
+        }
 
         return url;
     }
