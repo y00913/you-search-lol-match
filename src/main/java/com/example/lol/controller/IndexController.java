@@ -75,8 +75,14 @@ public class IndexController {
             if(rankType.get().getFlexUserTier() != null){
                 model.addAttribute("flexTierImg", iconService.callTierIcon(rankType.get().getFlexUserTier()));
             }
+            else {
+                model.addAttribute("flexTierImg", iconService.callTierIcon("unranked"));
+            }
             if(rankType.get().getSoloUserTier() != null){
                 model.addAttribute("soloTierImg", iconService.callTierIcon(rankType.get().getSoloUserTier()));
+            }
+            else {
+                model.addAttribute("soloTierImg", iconService.callTierIcon("unranked"));
             }
 
             model.addAttribute("rankType", rankType.get());
@@ -86,8 +92,14 @@ public class IndexController {
             if(rankType1.getFlexUserTier() != null){
                 model.addAttribute("flexTierImg", iconService.callTierIcon(rankType1.getFlexUserTier()));
             }
+            else {
+                model.addAttribute("flexTierImg", iconService.callTierIcon("unranked"));
+            }
             if(rankType1.getSoloUserTier() != null){
                 model.addAttribute("soloTierImg", iconService.callTierIcon(rankType1.getSoloUserTier()));
+            }
+            else {
+                model.addAttribute("soloTierImg", iconService.callTierIcon("unranked"));
             }
 
             model.addAttribute("rankType", rankType1);
