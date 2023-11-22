@@ -304,7 +304,9 @@ public class SummonerService {
 
         if (queueId.equals("400") || queueId.equals("430")) {
             result = "일반";
-        } else if (queueId.equals("420")) {
+        } else if (queueId.equals("490")){
+            result = "빠른 대전";
+        }  else if (queueId.equals("420")) {
             result = "솔랭";
         } else if (queueId.equals("440")) {
             result = "자유 랭크";
