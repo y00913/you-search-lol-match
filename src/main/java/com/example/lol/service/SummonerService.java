@@ -43,14 +43,14 @@ public class SummonerService {
     private String myKey;
 
     @Transactional
-    public Summoner callRiotAPISummonerByName(String summonerName) {
+    public Summoner callRiotAPISummonerByPuuid(RiotInfo riotInfo) {
         Summoner summonerDTO = new Summoner();
-        String summonerNameRepl = summonerName.replaceAll(" ","%20");
-        String url = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerNameRepl;
+        String summonerName = riotInfo.getName().replaceAll(" ", "%20");
+        String infoUrl = "https://asia.api.riotgames.com/riot/account/v1/accounts/by-riot-id/" + summonerName + "/" + riotInfo.getTagLine();
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(url + "?api_key=" + myKey);
+            HttpGet request = new HttpGet(infoUrl + "?api_key=" + myKey);
             HttpResponse response = client.execute(request);
 
             if (response.getStatusLine().getStatusCode() == 200) {
@@ -60,9 +60,31 @@ public class SummonerService {
                 JSONParser jsonParser = new JSONParser();
                 JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
 
-                summonerDTO.setName(jsonObject.get("name").toString());
-                summonerDTO.setId(jsonObject.get("id").toString());
+                summonerDTO.setName(jsonObject.get("gameName").toString());
+                summonerDTO.setTagLine(jsonObject.get("tagLine").toString());
                 summonerDTO.setPuuid(jsonObject.get("puuid").toString());
+            } else {
+                System.out.println("error : " + response.getStatusLine().getStatusCode());
+            }
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+
+        String lolUrl = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/" + summonerDTO.getPuuid();
+
+        try {
+            HttpClient client = HttpClientBuilder.create().build();
+            HttpGet request = new HttpGet(lolUrl + "?api_key=" + myKey);
+            HttpResponse response = client.execute(request);
+
+            if (response.getStatusLine().getStatusCode() == 200) {
+                ResponseHandler<String> handler = new BasicResponseHandler();
+                String body = handler.handleResponse(response);
+
+                JSONParser jsonParser = new JSONParser();
+                JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+
+                summonerDTO.setId(jsonObject.get("id").toString());
                 summonerDTO.setProfileIcon(jsonObject.get("profileIconId").toString());
                 summonerDTO.setSummonerLevel(Long.parseLong(jsonObject.get("summonerLevel").toString()));
 
@@ -258,7 +280,8 @@ public class SummonerService {
                 JSONObject participant = (JSONObject) participants.get(i);
                 MatchUserInfo matchUserInfoDTO = new MatchUserInfo();
 
-                matchUserInfoDTO.setSummonerName(participant.get("summonerName").toString());
+                matchUserInfoDTO.setSummonerName(participant.get("riotIdGameName").toString());
+                matchUserInfoDTO.setTagLine(participant.get("riotIdTagline").toString());
 
                 matchUserInfoDTO.setWin((boolean) participant.get("win"));
                 matchUserInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));

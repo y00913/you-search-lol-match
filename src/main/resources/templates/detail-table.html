@@ -54,14 +54,16 @@
             </div>
         </td>
         <td>
-            <th:block th:if="${userInfo.win == true}">
-                <p th:text="${userInfo.summonerName}"
-                   style="color: blue; font-weight: bold"></p>
-            </th:block>
-            <th:block th:if="${userInfo.win == false}">
-                <p th:text="${userInfo.summonerName}"
-                   style="color: red; font-weight: bold"></p>
-            </th:block>
+            <div>
+                <th:block th:if="${userInfo.win == true}">
+                    <p th:text="${userInfo.summonerName + '#' + userInfo.tagLine}"
+                       style="color: blue; font-weight: bold"></p>
+                </th:block>
+                <th:block th:if="${userInfo.win == false}">
+                    <p th:text="${userInfo.summonerName + '#' + userInfo.tagLine}"
+                       style="color: red; font-weight: bold"></p>
+                </th:block>
+            </div>
         </td>
         <td style="text-align: center">
             <span th:text="${userInfo.kills}" style="font-weight: bold"></span> /
