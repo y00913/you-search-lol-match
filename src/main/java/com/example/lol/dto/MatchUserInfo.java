@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MatchUserInfo {
     private String summonerName;
+    private String tagLine;
     private boolean win;
     private String championName;
     private int champLevel;

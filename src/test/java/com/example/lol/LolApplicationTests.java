@@ -214,4 +214,20 @@ class LolApplicationTests {
         System.out.println(summonerDTO);
     }
 
+    @Test
+    public void test5() {
+        String summonerName = "테스트";
+
+        if(!summonerName.contains("#")) {
+            summonerName += "#KR1";
+        }
+
+        int index = summonerName.indexOf("#");
+
+        String name = summonerName.substring(0, index);
+        String tagLine = summonerName.substring(index + 1);
+
+        System.out.println(name + " " + tagLine);
+    }
+
 }

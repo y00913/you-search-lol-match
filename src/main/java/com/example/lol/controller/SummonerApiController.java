@@ -1,9 +1,11 @@
 package com.example.lol.controller;
 
+import com.example.lol.dto.RiotInfo;
 import com.example.lol.dto.StartTimeMapping;
 import com.example.lol.dto.Summoner;
 import com.example.lol.repository.*;
 import com.example.lol.service.SummonerService;
+import com.example.lol.util.SummonerNameParse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
@@ -20,21 +22,12 @@ public class SummonerApiController {
     private SummonerService summonerService;
 
     @Autowired
-    private SummonerRepository summonerRepository;
-
-    @Autowired
     private MatchRepository matchRepository;
 
-    @PostMapping("/summonerByName/{summonerName}")
-    public Summoner callSummonerByName(@PathVariable String summonerName){
-        Optional<Summoner> result = summonerRepository.findByName(summonerName);
-
-        return result.get();
-    }
-
-    @GetMapping("/renewal/{summonerName}")
-    public void  renewal(@PathVariable String summonerName){
-        Summoner summoner = summonerService.callRiotAPISummonerByName(summonerName);
+    @GetMapping("/renewal/{name}/{tagLine}")
+    public void  renewal(@PathVariable String name, @PathVariable String tagLine){
+        RiotInfo riotInfo = new RiotInfo(name, tagLine);
+        Summoner summoner = summonerService.callRiotAPISummonerByPuuid(riotInfo);
         summonerService.callRankTier(summoner.getId());
         Optional<StartTimeMapping> startTime = matchRepository.findTop1ByPuuid(summoner.getPuuid(), Sort.by(Sort.Direction.DESC, "endTimeStamp"));
         List<String> matchHistory = new ArrayList<>();

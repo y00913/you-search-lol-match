@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SummonerNameTag {
+public class RiotInfo {
 
     private String name;
     private String tagLine;

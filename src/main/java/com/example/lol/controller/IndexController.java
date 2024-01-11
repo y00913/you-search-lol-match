@@ -4,6 +4,7 @@ import com.example.lol.dto.*;
 import com.example.lol.repository.*;
 import com.example.lol.service.IconService;
 import com.example.lol.service.SummonerService;
+import com.example.lol.util.SummonerNameParse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,15 +42,16 @@ public class IndexController {
     }
 
     @GetMapping("/search")
-    public String getResult(String summonerName, Model model) {
-        Optional<Summoner> summonerDTO = summonerRepository.findByName(summonerName);
+    public String getResult(String nameAndTag, Model model) {
+        RiotInfo riotInfo = SummonerNameParse.getNameAndTage(nameAndTag);
+        Optional<Summoner> summonerDTO = summonerRepository.findByNameAndTagLine(riotInfo.getName(), riotInfo.getTagLine());
         String puuid = "";
 
         if (summonerDTO.isPresent()) {
             model.addAttribute("summoner", summonerDTO.get());
             puuid = summonerDTO.get().getPuuid();
         } else {
-            Summoner tmp = summonerService.callRiotAPISummonerByName(summonerName);
+            Summoner tmp = summonerService.callRiotAPISummonerByPuuid(riotInfo);
             if(tmp.getName() != null){
                 puuid = tmp.getPuuid();
                 model.addAttribute("summoner", tmp);
@@ -67,8 +69,8 @@ public class IndexController {
         return "result";
     }
 
-    @GetMapping("/{id}/{name}/{summonerLevel}/{profileIcon}")
-    public String callLeagueInfo(@PathVariable String id, @PathVariable String name, @PathVariable String summonerLevel, @PathVariable String profileIcon, Model model){
+    @GetMapping("/{id}/{name}/{tagLine}/{summonerLevel}/{profileIcon}")
+    public String callLeagueInfo(@PathVariable String id, @PathVariable String name, @PathVariable String tagLine, @PathVariable String summonerLevel, @PathVariable String profileIcon, Model model){
         Optional<RankType> rankType = rankTypeRepository.findById(id);
 
         if(rankType.isPresent()){
@@ -106,6 +108,7 @@ public class IndexController {
         }
 
         model.addAttribute("name", name);
+        model.addAttribute("tagLine", tagLine);
         model.addAttribute("summonerLevel", summonerLevel);
         model.addAttribute("profileIcon", iconService.callProfileIcon(profileIcon));
 

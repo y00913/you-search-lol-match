@@ -15,6 +15,7 @@ public class Summoner {
     @Id
     private String puuid;
     private String name;
+    private String tagLine;
     private String id;
     private String profileIcon;
     private Long summonerLevel;

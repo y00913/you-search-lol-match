@@ -16,6 +16,7 @@
                         <h2>
                             <p>
                                 <span th:text="${name}"></span>
+                                <span th:text="'#' + ${tagLine}"></span>
                             </p>
                             <p>
                                 레벨 : <span th:text="${summonerLevel}"></span>
@@ -26,7 +27,7 @@
                     <td style="width: 60px">
                         <div style="text-align: center">
                             <div id="renewal">
-                                <button type="button" th:onclick="callRenewal([[${name}]])"
+                                <button type="button" th:onclick="callRenewal([[${name}]] , [[${tagLine}]])"
                                         style="background-color: #76B8E0; color: #F1F1F1; border: none; border-radius: 10px;
                                         width: 60px; height: 30px; display: flex; align-items:center; justify-content: center; cursor:pointer;">
                                     <p style="font-weight: bold; font-size: 16px;">
@@ -115,9 +116,9 @@
 </div>
 
 <script>
-    function callRenewal(summonerName) {
+    function callRenewal(summonerName, tagLine) {
         $.ajax({
-            url: '/api/renewal/' + summonerName,
+            url: '/api/renewal/' + summonerName + '/' + tagLine,
             type: 'GET',
             beforeSend: function () {
                 $('#loading_renewal').show();
