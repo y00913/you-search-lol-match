@@ -54,14 +54,22 @@
             </div>
         </td>
         <td>
-            <div>
+            <div style="vertical-align: top; max-width: 7vw;">
                 <th:block th:if="${userInfo.win == true}">
-                    <p th:text="${userInfo.summonerName + '#' + userInfo.tagLine}"
-                       style="color: blue; font-weight: bold"></p>
+                    <a th:text="${userInfo.summonerName}" th:href="@{/search(nameAndTag=${userInfo.summonerName + '#' + userInfo.tagLine})}"
+                       style="color: blue; font-weight: bold; text-decoration: none;" target='_blank'></a>
+                    <br>
+                    <a th:text="${'#' + userInfo.tagLine}"
+                       style="color: blue; font-weight: bold"></a>
                 </th:block>
                 <th:block th:if="${userInfo.win == false}">
-                    <p th:text="${userInfo.summonerName + '#' + userInfo.tagLine}"
-                       style="color: red; font-weight: bold"></p>
+                    <a>
+                    <a th:text="${userInfo.summonerName}" th:href="@{/search(nameAndTag=${userInfo.summonerName + '#' + userInfo.tagLine})}"
+                       style="color: red; font-weight: bold; text-decoration: none;" target='_blank'></a>
+                    <br>
+                    <a th:text="${'#' + userInfo.tagLine}"
+                       style="color: red; font-weight: bold"></a>
+                    </a>
                 </th:block>
             </div>
         </td>
