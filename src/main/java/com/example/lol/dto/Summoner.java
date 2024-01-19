@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -19,4 +20,5 @@ public class Summoner {
     private String id;
     private String profileIcon;
     private Long summonerLevel;
+    private LocalDateTime updateAt;
 }

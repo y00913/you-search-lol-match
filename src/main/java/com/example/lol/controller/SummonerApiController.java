@@ -5,7 +5,6 @@ import com.example.lol.dto.StartTimeMapping;
 import com.example.lol.dto.Summoner;
 import com.example.lol.repository.*;
 import com.example.lol.service.SummonerService;
-import com.example.lol.util.SummonerNameParse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;

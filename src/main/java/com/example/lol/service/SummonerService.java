@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -87,6 +89,7 @@ public class SummonerService {
                 summonerDTO.setId(jsonObject.get("id").toString());
                 summonerDTO.setProfileIcon(jsonObject.get("profileIconId").toString());
                 summonerDTO.setSummonerLevel(Long.parseLong(jsonObject.get("summonerLevel").toString()));
+                summonerDTO.setUpdateAt(LocalDateTime.now());
 
                 summonerRepository.save(summonerDTO);
             } else {
