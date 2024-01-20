@@ -22,6 +22,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,12 @@ public class SummonerService {
 
     @Transactional
     public Summoner callRiotAPISummonerByPuuid(RiotInfo riotInfo) {
-        Summoner summonerDTO = new Summoner();
+        Summoner summonerDTO = summonerRepository.findByNameAndTagLine(riotInfo.getName(), riotInfo.getTagLine()).orElse(new Summoner());
+
+        if(summonerDTO.getUpdateAt() != null && ChronoUnit.MINUTES.between(summonerDTO.getUpdateAt(), LocalDateTime.now()) < 10){
+            throw new RuntimeException("조회한지 10분이 지나지 않았습니다.");
+        }
+
         String summonerName = riotInfo.getName().replaceAll(" ", "%20");
         String infoUrl = "https://asia.api.riotgames.com/riot/account/v1/accounts/by-riot-id/" + summonerName + "/" + riotInfo.getTagLine();
 

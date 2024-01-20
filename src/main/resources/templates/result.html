@@ -70,7 +70,7 @@
 
         if ([[${summoner}]] != null) {
             $.ajax({
-                url: '/' + [[${summoner?.id}]] + '/' + [[${summoner?.name}]] + '/' + [[${summoner?.tagLine}]] + '/' + [[${summoner?.summonerLevel}]] + "/" + [[${summoner?.profileIcon}]],
+                url: '/' + [[${summoner?.id}]] + '/' + [[${summoner?.name}]] + '/' + [[${summoner?.tagLine}]] + '/' + [[${summoner?.summonerLevel}]] + "/" + [[${summoner?.profileIcon}]] + "/" + [[${summoner?.updateAt}]],
                 type: 'GET',
             }).done(function (result) {
                 $('#info').replaceWith(result);

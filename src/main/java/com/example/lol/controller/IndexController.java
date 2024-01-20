@@ -13,6 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,8 +71,14 @@ public class IndexController {
         return "result";
     }
 
-    @GetMapping("/{id}/{name}/{tagLine}/{summonerLevel}/{profileIcon}")
-    public String callLeagueInfo(@PathVariable String id, @PathVariable String name, @PathVariable String tagLine, @PathVariable String summonerLevel, @PathVariable String profileIcon, Model model){
+    @GetMapping("/{id}/{name}/{tagLine}/{summonerLevel}/{profileIcon}/{updateAt}")
+    public String callLeagueInfo(@PathVariable String id,
+                                 @PathVariable String name,
+                                 @PathVariable String tagLine,
+                                 @PathVariable String summonerLevel,
+                                 @PathVariable String profileIcon,
+                                 @PathVariable String updateAt,
+                                 Model model){
         Optional<RankType> rankType = rankTypeRepository.findById(id);
 
         if(rankType.isPresent()){
@@ -111,6 +119,9 @@ public class IndexController {
         model.addAttribute("tagLine", tagLine);
         model.addAttribute("summonerLevel", summonerLevel);
         model.addAttribute("profileIcon", iconService.callProfileIcon(profileIcon));
+
+        Long diff = ChronoUnit.MINUTES.between(LocalDateTime.parse(updateAt), LocalDateTime.now());
+        model.addAttribute("updateAt", diff);
 
         return "league-info";
     }
