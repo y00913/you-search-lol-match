@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -331,7 +330,15 @@ public class SummonerService {
         return matchUserInfoDTOs;
     }
 
-    public String findQueueType(String queueId) {
+    public Optional<Summoner> findSummoner(RiotInfo riotInfo){
+        return summonerRepository.findByNameAndTagLine(riotInfo.getName(), riotInfo.getTagLine());
+    }
+
+    public Boolean checkMatch(String puuid) {
+        return matchRepository.existsByPuuid(puuid);
+    }
+
+    private String findQueueType(String queueId) {
         String result = "";
 
         if (queueId.equals("400") || queueId.equals("430")) {

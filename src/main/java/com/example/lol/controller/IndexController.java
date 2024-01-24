@@ -3,8 +3,10 @@ package com.example.lol.controller;
 import com.example.lol.dto.*;
 import com.example.lol.repository.*;
 import com.example.lol.service.IconService;
+import com.example.lol.service.SummonerFacadeService;
 import com.example.lol.service.SummonerService;
 import com.example.lol.util.SummonerNameParse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,22 +22,14 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/")
+@RequiredArgsConstructor
 public class IndexController {
 
-    @Autowired
-    private SummonerService summonerService;
-
-    @Autowired
-    private IconService iconService;
-
-    @Autowired
-    private SummonerRepository summonerRepository;
-
-    @Autowired
-    private MatchRepository matchRepository;
-
-    @Autowired
-    private RankTypeRepository rankTypeRepository;
+    private final SummonerService summonerService;
+    private final IconService iconService;
+    private final SummonerFacadeService summonerFacadeService;
+    private final RankTypeRepository rankTypeRepository;
+    private final MatchRepository matchRepository;
 
     @GetMapping
     public String index() {
@@ -45,28 +39,14 @@ public class IndexController {
 
     @GetMapping("/search")
     public String getResult(String nameAndTag, Model model) {
-        RiotInfo riotInfo = SummonerNameParse.getNameAndTage(nameAndTag);
-        Optional<Summoner> summonerDTO = summonerRepository.findByNameAndTagLine(riotInfo.getName(), riotInfo.getTagLine());
-        String puuid = "";
+        Summoner summonerDTO = summonerFacadeService.getSummoner(nameAndTag);
 
-        if (summonerDTO.isPresent()) {
-            model.addAttribute("summoner", summonerDTO.get());
-            puuid = summonerDTO.get().getPuuid();
-        } else {
-            Summoner tmp = summonerService.callRiotAPISummonerByPuuid(riotInfo);
-            if(tmp.getName() != null){
-                puuid = tmp.getPuuid();
-                model.addAttribute("summoner", tmp);
-            }
+        if(summonerDTO.getPuuid() != null) {
+            model.addAttribute("summoner", summonerDTO);
         }
 
-        if(matchRepository.findByPuuid(puuid).isEmpty()){
-            model.addAttribute("check", false);
-        } else {
-            model.addAttribute("check", true);
-        }
-
-        System.out.println(summonerDTO);
+        Boolean check = summonerFacadeService.checkSummonerMatch(summonerDTO.getPuuid());
+        model.addAttribute("check", check);
 
         return "result";
     }

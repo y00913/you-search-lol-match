@@ -14,4 +14,5 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
     List<Match> findByPuuid(String puuid);
     Page<Match> findByPuuid(Pageable pageable, String puuid);
     Optional<StartTimeMapping> findTop1ByPuuid(String puuid, Sort sort);
+    Boolean existsByPuuid(String puuid);
 }
