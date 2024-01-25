@@ -20,6 +20,10 @@ public class IconService {
     }
 
     public String callTierIcon(String tier) {
+        if(tier == null) {
+            tier = "unranked";
+        }
+
         String url ="/static/img/" + tier.toLowerCase() + ".png";
 
         return url;

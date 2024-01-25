@@ -25,11 +25,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class IndexController {
 
-    private final SummonerService summonerService;
-    private final IconService iconService;
     private final SummonerFacadeService summonerFacadeService;
-    private final RankTypeRepository rankTypeRepository;
-    private final MatchRepository matchRepository;
 
     @GetMapping
     public String index() {
@@ -59,46 +55,16 @@ public class IndexController {
                                  @PathVariable String profileIcon,
                                  @PathVariable String updateAt,
                                  Model model){
-        Optional<RankType> rankType = rankTypeRepository.findById(id);
+        RankTypeDto rankTypeDto = summonerFacadeService.getSummonerRankInfo(id);
 
-        if(rankType.isPresent()){
-            if(rankType.get().getFlexUserTier() != null){
-                model.addAttribute("flexTierImg", iconService.callTierIcon(rankType.get().getFlexUserTier()));
-            }
-            else {
-                model.addAttribute("flexTierImg", iconService.callTierIcon("unranked"));
-            }
-            if(rankType.get().getSoloUserTier() != null){
-                model.addAttribute("soloTierImg", iconService.callTierIcon(rankType.get().getSoloUserTier()));
-            }
-            else {
-                model.addAttribute("soloTierImg", iconService.callTierIcon("unranked"));
-            }
-
-            model.addAttribute("rankType", rankType.get());
-        } else {
-            RankType rankType1 = summonerService.callRankTier(id);
-
-            if(rankType1.getFlexUserTier() != null){
-                model.addAttribute("flexTierImg", iconService.callTierIcon(rankType1.getFlexUserTier()));
-            }
-            else {
-                model.addAttribute("flexTierImg", iconService.callTierIcon("unranked"));
-            }
-            if(rankType1.getSoloUserTier() != null){
-                model.addAttribute("soloTierImg", iconService.callTierIcon(rankType1.getSoloUserTier()));
-            }
-            else {
-                model.addAttribute("soloTierImg", iconService.callTierIcon("unranked"));
-            }
-
-            model.addAttribute("rankType", rankType1);
-        }
+        model.addAttribute("rankType", rankTypeDto.getRankType());
+        model.addAttribute("flexTierImg", rankTypeDto.getFlexUserTier());
+        model.addAttribute("soloTierImg", rankTypeDto.getSoloUserTier());
 
         model.addAttribute("name", name);
         model.addAttribute("tagLine", tagLine);
         model.addAttribute("summonerLevel", summonerLevel);
-        model.addAttribute("profileIcon", iconService.callProfileIcon(profileIcon));
+        model.addAttribute("profileIcon", summonerFacadeService.getProfileIcon(profileIcon));
 
         Long diff = ChronoUnit.MINUTES.between(LocalDateTime.parse(updateAt), LocalDateTime.now());
         model.addAttribute("updateAt", diff);
@@ -108,38 +74,7 @@ public class IndexController {
 
     @GetMapping("/{puuid}/{start}")
     public String callMatchTable(@PathVariable String puuid, @PathVariable int start, Model model) {
-        Page<Match> matchDTOs = matchRepository.findByPuuid(PageRequest.of(start,10, Sort.Direction.DESC, "endTimeStamp"), puuid);
-        for(Match match : matchDTOs){
-            Match tmp = match;
-
-            tmp.setItem0(iconService.callItemIcon(tmp.getItem0()));
-            tmp.setItem1(iconService.callItemIcon(tmp.getItem1()));
-            tmp.setItem2(iconService.callItemIcon(tmp.getItem2()));
-            tmp.setItem3(iconService.callItemIcon(tmp.getItem3()));
-            tmp.setItem4(iconService.callItemIcon(tmp.getItem4()));
-            tmp.setItem5(iconService.callItemIcon(tmp.getItem5()));
-            tmp.setItem6(iconService.callItemIcon(tmp.getItem6()));
-            tmp.setChampionName(iconService.callChampionIcon(tmp.getChampionName()));
-            tmp.setSpell1Id(iconService.callSpellIcon(tmp.getSpell1Id()));
-            tmp.setSpell2Id(iconService.callSpellIcon(tmp.getSpell2Id()));
-            tmp.setPrimaryPerk(iconService.callPrimaryPerkIcon(tmp.getPrimaryPerk()));
-            tmp.setSubPerk(iconService.callSubPerkIcon(tmp.getSubPerk()));
-
-            long timestamp = System.currentTimeMillis() / 1000 - tmp.getEndTimeStamp();
-            String endTime;
-            if (timestamp < 60) {
-                endTime = Math.round(timestamp) + "초 전";
-            } else if (timestamp / 60 < 60) {
-                endTime = Math.round(timestamp / 60) + "분 전";
-            } else if (timestamp / 60 / 60 < 24) {
-                endTime = Math.round(timestamp / 60 / 60) + "시간 전";
-            } else if (timestamp / 60 / 60 / 24 < 30) {
-                endTime = Math.round(timestamp / 60 / 60 / 24) + "일 전";
-            } else {
-                endTime = Math.round(timestamp / 60 / 60 / 24 / 30) + "달 전";
-            }
-            tmp.setEndTime(endTime);
-        }
+        Page<Match> matchDTOs = summonerFacadeService.getPagingMatch(puuid, start);
 
         model.addAttribute("matches", matchDTOs.getContent());
 
@@ -148,7 +83,7 @@ public class IndexController {
 
     @GetMapping("/detail/{matchId}")
     public String callDeatilMatchTable(@PathVariable String matchId, Model model) {
-        List<MatchUserInfo> matchUserInfoDTOs = summonerService.callDetailMatch(matchId);
+        List<MatchUserInfo> matchUserInfoDTOs = summonerFacadeService.getDetailMatch(matchId);
 
         model.addAttribute("matchInfo", matchUserInfoDTOs);
 

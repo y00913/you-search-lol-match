@@ -15,6 +15,9 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -28,9 +31,6 @@ import java.util.stream.Collectors;
 @Service
 @PropertySource(value = "classpath:riotApiKey.properties")
 public class SummonerService {
-    
-    @Autowired
-    private IconService iconService;
 
     @Autowired
     private SummonerRepository summonerRepository;
@@ -292,7 +292,8 @@ public class SummonerService {
                 matchUserInfoDTO.setTagLine(participant.get("riotIdTagline").toString());
 
                 matchUserInfoDTO.setWin((boolean) participant.get("win"));
-                matchUserInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
+//                matchUserInfoDTO.setChampionName(iconService.callChampionIcon(participant.get("championName").toString()));
+                matchUserInfoDTO.setChampionName(participant.get("championName").toString());
                 matchUserInfoDTO.setChampLevel(Integer.parseInt(participant.get("champLevel").toString()));
                 matchUserInfoDTO.setKills(Integer.parseInt(participant.get("kills").toString()));
                 matchUserInfoDTO.setDeaths(Integer.parseInt(participant.get("deaths").toString()));
@@ -303,7 +304,7 @@ public class SummonerService {
                 List<String> items = new ArrayList<>();
 
                 for (int j = 0; j <= 6; j++) {
-                    items.add(iconService.callItemIcon(participant.get("item" + j).toString()));
+                    items.add(participant.get("item" + j).toString());
                 }
 
                 matchUserInfoDTO.setItems(items);
@@ -315,10 +316,10 @@ public class SummonerService {
                 JSONArray primarySelections = (JSONArray) primaryStyle.get("selections");
                 JSONObject primarySelectionsNumber = (JSONObject) primarySelections.get(0);
 
-                matchUserInfoDTO.setPrimaryPerk(iconService.callPrimaryPerkIcon(primarySelectionsNumber.get("perk").toString()));
-                matchUserInfoDTO.setSubPerk(iconService.callSubPerkIcon(subStyle.get("style").toString()));
-                matchUserInfoDTO.setSpell1Id(iconService.callSpellIcon(participant.get("summoner1Id").toString()));
-                matchUserInfoDTO.setSpell2Id(iconService.callSpellIcon(participant.get("summoner2Id").toString()));
+                matchUserInfoDTO.setPrimaryPerk(primarySelectionsNumber.get("perk").toString());
+                matchUserInfoDTO.setSubPerk(subStyle.get("style").toString());
+                matchUserInfoDTO.setSpell1Id(participant.get("summoner1Id").toString());
+                matchUserInfoDTO.setSpell2Id(participant.get("summoner2Id").toString());
 
                 matchUserInfoDTOs.add(matchUserInfoDTO);
             }
@@ -336,6 +337,14 @@ public class SummonerService {
 
     public Boolean checkMatch(String puuid) {
         return matchRepository.existsByPuuid(puuid);
+    }
+
+    public Optional<RankType> findRankType(String id) {
+        return rankTypeRepository.findById(id);
+    }
+
+    public Page<Match> findPagingMatch(String puuid, int start){
+        return matchRepository.findByPuuid(PageRequest.of(start,10, Sort.Direction.DESC, "endTimeStamp"), puuid);
     }
 
     private String findQueueType(String queueId) {
