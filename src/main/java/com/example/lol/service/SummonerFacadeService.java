@@ -5,8 +5,6 @@ import com.example.lol.util.SummonerNameParse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -109,6 +107,20 @@ public class SummonerFacadeService {
         }
 
         return matchUserInfoList;
+    }
+
+    public void callRenewal(String name, String tagLine) {
+        RiotInfo riotInfo = new RiotInfo(name, tagLine);
+        Summoner summoner = summonerService.callRiotAPISummonerByPuuid(riotInfo);
+        summonerService.callRankTier(summoner.getId());
+        Optional<StartTimeMapping> startTime = summonerService.getStartTime(summoner.getPuuid());
+        List<String> matchHistory = new ArrayList<>();
+        if(startTime.isPresent()) {
+            matchHistory = summonerService.callMatchHistory(summoner.getPuuid(), startTime.get().getEndTimeStamp() + 10);
+        } else {
+            matchHistory = summonerService.callMatchHistory(summoner.getPuuid(), 0L);
+        }
+        summonerService.callMatchAbout(matchHistory, summoner.getPuuid());
     }
 
 }

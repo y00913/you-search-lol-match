@@ -1,16 +1,9 @@
 package com.example.lol.controller;
 
 import com.example.lol.dto.*;
-import com.example.lol.repository.*;
-import com.example.lol.service.IconService;
 import com.example.lol.service.SummonerFacadeService;
-import com.example.lol.service.SummonerService;
-import com.example.lol.util.SummonerNameParse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/")
