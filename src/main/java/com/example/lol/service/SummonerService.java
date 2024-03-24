@@ -49,8 +49,8 @@ public class SummonerService {
     public Summoner callRiotAPISummonerByPuuid(RiotInfo riotInfo) {
         Summoner summonerDTO = summonerRepository.findByNameAndTagLine(riotInfo.getName(), riotInfo.getTagLine()).orElse(new Summoner());
 
-        if(summonerDTO.getUpdateAt() != null && ChronoUnit.MINUTES.between(summonerDTO.getUpdateAt(), LocalDateTime.now()) < 10){
-            throw new RuntimeException("조회한지 10분이 지나지 않았습니다.");
+        if(summonerDTO.getUpdateAt() != null && ChronoUnit.MINUTES.between(summonerDTO.getUpdateAt(), LocalDateTime.now()) <= 2){
+            throw new RuntimeException("조회한지 2분이 지나지 않았습니다.");
         }
 
         String summonerName = riotInfo.getName().replaceAll(" ", "%20");
