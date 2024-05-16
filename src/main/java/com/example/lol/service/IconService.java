@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class IconService {
-    private String version = "14.9.1";
+    private String version = "14.10.1";
 
     public String callProfileIcon(String profileIcon){
         String url = "https://ddragon.leagueoflegends.com/cdn/" + version + "/img/profileicon/" + profileIcon + ".png";
